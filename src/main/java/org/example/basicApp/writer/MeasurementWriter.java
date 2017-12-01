@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import com.amazonaws.ClientConfiguration;
@@ -63,8 +62,6 @@ public class MeasurementWriter {
      *        exist or should be created.
      * @throws InterruptedException If this application is interrupted while sending records to Kinesis.
      */
-	static Random rand = new Random();	
-	private static final float deviation = 0.1f;	
 	
     private static void checkUsage(String[] args) {
         if (args.length != 2) {
@@ -96,14 +93,10 @@ public class MeasurementWriter {
 			streamUtils.createStreamIfNotExists(streamName, 2);
 			LOG.info(String.format("%s stream is ready for use", streamName));
 
-		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		Date date = new Date();
-		//System.out.println(dateFormat.format(date));
-			
-        // Repeatedly send measurements with a 1000 milliseconds wait in between
-		VrMeasurement vrMeasurement = new VrMeasurement("EEG-sensor", dateFormat.format(date) ,"host", getRandomFloat(0.9f).toString(), getRandomFloat(0.9f).toString(),getRandomFloat(0.7f).toString(),
-				getRandomFloat(0.2f).toString(),getRandomFloat(0.1f).toString(),getRandomFloat(0.7f).toString());
-		final MeasurementPutter measurementPutter = new MeasurementPutter(vrMeasurement, 
+	        // Repeatedly send measurements with a 1000 milliseconds wait in between
+			//VrMeasurement vrMeasurement = new VrMeasurement();		
+		
+		MeasurementPutter measurementPutter = new MeasurementPutter(/*vrMeasurement,*/ 
 					kinesisClient, streamName);
 
 		ExecutorService es = Executors.newCachedThreadPool();
@@ -130,16 +123,4 @@ public class MeasurementWriter {
         
     }
 
-    public static Float getRandomFloat(Float mean) {
-        
-    	// set the price using the deviation and mean price
-        
-    	Float max = mean + deviation;
-    	Float min = mean - deviation;
-
-        // randomly pick a quantity of shares
-        Float value = rand.nextFloat() * (max - min) + min; 
-
-        return value;
-    }
 }

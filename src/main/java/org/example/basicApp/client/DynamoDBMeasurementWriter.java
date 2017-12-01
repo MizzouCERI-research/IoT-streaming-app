@@ -2,10 +2,13 @@
 package org.example.basicApp.client;
 
 import java.net.UnknownHostException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +22,8 @@ import org.apache.commons.logging.LogFactory;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper.FailedBatch;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+
 import org.example.basicApp.model.MeasurementDynamoDB;
 import org.example.basicApp.client.DBWriter;
 import org.example.basicApp.model.VrMeasurement;
@@ -45,7 +50,7 @@ public class DynamoDBMeasurementWriter implements DBWriter<VrMeasurement> {
     private static final int MAX_COUNTS_IN_MEMORY = 60000;
 
     // The queue holds all pending referrer pair counts to be sent to DynamoDB.
-    private BlockingQueue<VrMeasurement> queue = new LinkedBlockingQueue<>(MAX_COUNTS_IN_MEMORY);
+    private BlockingQueue<Map<String, AttributeValue>> queue = new LinkedBlockingQueue<>(MAX_COUNTS_IN_MEMORY);
 
     // The thread to use for sending counts to DynamoDB.
     private Thread dynamoDBSender;
@@ -72,7 +77,7 @@ public class DynamoDBMeasurementWriter implements DBWriter<VrMeasurement> {
             @Override
             public void run() {
                 // Create a reusable buffer to drain our queue into.
-                List<VrMeasurement> buffer = new ArrayList<>(MAX_COUNTS_IN_MEMORY);
+                List<Map<String, AttributeValue>> buffer = new ArrayList<>(MAX_COUNTS_IN_MEMORY);
 
                 // Continuously attempt to drain the queue and send counts to DynamoDB until this thread is interrupted
                 while (!Thread.currentThread().isInterrupted()) {
@@ -107,8 +112,8 @@ public class DynamoDBMeasurementWriter implements DBWriter<VrMeasurement> {
             // short circuit to avoid creating a map when we have no objects to persist
             return;
         }
-
-        queue.add(measurementRecord);
+        Map<String, AttributeValue> item = newItem(measurementRecord);
+        queue.add(item);
     }
     
     /**
@@ -138,7 +143,7 @@ public class DynamoDBMeasurementWriter implements DBWriter<VrMeasurement> {
      *        an optimization to avoid allocating a new buffer every interval.
      * @throws InterruptedException Thread interrupted while waiting for new data to arrive in the queue.
      */
-    protected void sendQueueToDynamoDB(List<VrMeasurement> buffer) throws InterruptedException {
+    protected void sendQueueToDynamoDB(List<Map<String, AttributeValue>> buffer) throws InterruptedException {
         // Block while waiting for data
         buffer.add(queue.take());
         // Drain as much of the queue as we can.
@@ -159,6 +164,25 @@ public class DynamoDBMeasurementWriter implements DBWriter<VrMeasurement> {
         } catch (Exception ex) {
             LOG.error("Error sending new counts to DynamoDB. The some counts may not be persisted.", ex);
         }
+    }
+    
+    private static Map<String, AttributeValue> newItem(VrMeasurement record) {
+    	
+    	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		//System.out.println(dateFormat.format(date));			
+		
+        Map<String, AttributeValue> item = new HashMap<String, AttributeValue>();
+        item.put("resource", new AttributeValue(record.getResource()));
+        item.put("timestamp", new AttributeValue(dateFormat.format(record.getTimeStamp())));
+        item.put("host", new AttributeValue(record.getHost()));
+        item.put("engagement", new AttributeValue(record.getEngagement()));
+        item.put("focus", new AttributeValue(record.getFocus()));
+        item.put("excitement", new AttributeValue(record.getExcitement()));
+        item.put("frustration", new AttributeValue(record.getFrustration()));
+        item.put("stress", new AttributeValue(record.getStress()));
+        item.put("relaxation", new AttributeValue(record.getRelaxation()));
+
+        return item;
     }
 
 }
