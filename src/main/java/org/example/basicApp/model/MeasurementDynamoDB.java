@@ -18,7 +18,7 @@ public class MeasurementDynamoDB {
 	private String resource;
 	
     // The timestamp when the counts were calculated
-    private String timestamp;
+    private Date timestamp;
     // Store the hostname of the worker that updated the count
     private String host;
     // Ordered list of referrer counts in descending order. Top N can be simply obtained by inspecting the first N
@@ -42,11 +42,11 @@ public class MeasurementDynamoDB {
 
 
     @DynamoDBRangeKey
-    public String getTimeStamp() {
+    public Date getTimeStamp() {
         return timestamp;
     }
 
-    public void setTimeStamp(String timestamp) {
+    public void setTimeStamp(Date timestamp) {
         this.timestamp = timestamp;
     }
 
