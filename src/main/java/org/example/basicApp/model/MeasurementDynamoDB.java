@@ -18,6 +18,7 @@ public class MeasurementDynamoDB {
 	private String resource;
 	
     // The timestamp when the counts were calculated
+	// test
     private Date timestamp;
     // Store the hostname of the worker that updated the count
     private String host;
