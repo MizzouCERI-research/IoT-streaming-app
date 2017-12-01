@@ -32,19 +32,7 @@ public class VrMeasurement {
     private String stress;
     private String relaxation;
 
-	/*		
-	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-	Date date = new Date();
-	//System.out.println(dateFormat.format(date));			
-    // Repeatedly send measurements with a 1000 milliseconds wait in between
-	VrMeasurement vrMeasurement = new VrMeasurement("EEG-sensor", dateFormat.format(date) ,"host", getRandomFloat(0.9f).toString(), getRandomFloat(0.9f).toString(),getRandomFloat(0.7f).toString(),
-			getRandomFloat(0.2f).toString(),getRandomFloat(0.1f).toString(),getRandomFloat(0.7f).toString());
-*/	
-	
-		//DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		//Date date = new Date();
-		//System.out.println(dateFormat.format(date));			
-    
+   
     public VrMeasurement() {
         
         Date date = new Date();
@@ -130,7 +118,7 @@ public class VrMeasurement {
     @Override
     public String toString() {
         return String.format("Current measurement of values: %s %s %s %s %s %s %s %s %s ",
-               resource, timestamp, host, engagement, focus, excitement, frustration, stress, relaxation);
+               resource, "timestamp", host, engagement, focus, excitement, frustration, stress, relaxation);
     }
 
 }

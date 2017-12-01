@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.example.basicApp.model.VrMeasurement;
-
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.services.kinesis.AmazonKinesis;
 import com.amazonaws.services.kinesis.model.ProvisionedThroughputExceededException;
@@ -22,23 +21,23 @@ public class MeasurementPutter {
     private static final Log LOG = LogFactory.getLog(MeasurementPutter.class);
     
 	
-	//private VrMeasurement vrMeasurement;
+	private VrMeasurement vrMeasurement;
     private AmazonKinesis kinesis;
     private String streamName;
 
     private final ObjectMapper JSON = new ObjectMapper();
 
-    public MeasurementPutter(/*VrMeasurement vrMeasurement,*/ AmazonKinesis kinesis, String streamName) {
-        //if (vrMeasurement == null) {
-         //   throw new IllegalArgumentException("vrMeasurement must not be null");
-        //}
+    public MeasurementPutter(VrMeasurement vrMeasurement, AmazonKinesis kinesis, String streamName) {
+        if (vrMeasurement == null) {
+           throw new IllegalArgumentException("vrMeasurement must not be null");
+        }
         if (kinesis == null) {
             throw new IllegalArgumentException("kinesis must not be null");
         }
         if (streamName == null || streamName.isEmpty()) {
             throw new IllegalArgumentException("streamName must not be null or empty");
         }
-        //this.vrMeasurement = vrMeasurement;
+        this.vrMeasurement = vrMeasurement;
         this.kinesis = kinesis;
         this.streamName = streamName;
     }	
@@ -86,7 +85,7 @@ public class MeasurementPutter {
     private void sendMeasurement() {  
     	
         // Repeatedly send measurements with a 1000 milliseconds wait in between
-    	VrMeasurement vrMeasurement = new VrMeasurement();	
+    	//VrMeasurement vrMeasurement = new VrMeasurement();	
     	
         byte[] bytes;
         try {
