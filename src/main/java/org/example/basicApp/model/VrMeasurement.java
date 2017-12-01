@@ -118,7 +118,7 @@ public class VrMeasurement {
     @Override
     public String toString() {
         return String.format("Current measurement of values: %s %s %s %s %s %s %s %s %s ",
-               resource, "timestamp", host, engagement, focus, excitement, frustration, stress, relaxation);
+               resource, timestamp, host, engagement, focus, excitement, frustration, stress, relaxation);
     }
 
 }
