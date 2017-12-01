@@ -94,10 +94,9 @@ public class MeasurementWriter {
 			LOG.info(String.format("%s stream is ready for use", streamName));
 
 	        // Repeatedly send measurements with a 1000 milliseconds wait in between
-			VrMeasurement vrMeasurement = new VrMeasurement();		
+			//VrMeasurement vrMeasurement = new VrMeasurement();		
 		
-		final MeasurementPutter measurementPutter = new MeasurementPutter(vrMeasurement, 
-					kinesisClient, streamName);
+		final MeasurementPutter measurementPutter = new MeasurementPutter(/*vrMeasurement,*/ kinesisClient, streamName);
 
 		ExecutorService es = Executors.newCachedThreadPool();
 
