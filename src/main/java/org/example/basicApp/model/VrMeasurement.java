@@ -8,10 +8,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
+@DynamoDBTable(tableName = "measurementDBTable")
 public class VrMeasurement {
 
 	private static final float deviation = 0.1f;
@@ -49,42 +53,89 @@ public class VrMeasurement {
         this.stress = getRandomFloat(0.1f).toString();
         this.relaxation = getRandomFloat(0.7f).toString();
     }
-
+    
+    @DynamoDBHashKey(attributeName = "resource")
     public String getResource() {
         return resource;
     }
 
+    public void setResource(String resource) {
+        this.resource = resource;
+    }
+
+
+    @DynamoDBRangeKey(attributeName = "timestamp")
     public String getTimeStamp() {
         return timestamp;
     }
 
+    public void setTimeStamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    @DynamoDBAttribute(attributeName = "host")
     public String getHost() {
         return host;
-    }    
-    
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    @DynamoDBAttribute(attributeName = "engagement")
     public String getEngagement() {
         return engagement;
     }
 
+    public void setEngagement(String engagement) {
+        this.engagement = engagement;
+    }
+    
+    @DynamoDBAttribute(attributeName = "resource")
     public String getFocus() {
         return focus;
     }
 
+    public void setFocus(String focus) {
+        this.focus = focus;
+    }
+    
+    @DynamoDBAttribute(attributeName = "excitement")
     public String getExcitement() {
         return excitement;
     }
 
+    public void setExcitement(String excitement) {
+        this.excitement = excitement;
+    }
+    
+    @DynamoDBAttribute(attributeName = "frustration")
     public String getFrustration() {
         return frustration;
     }
 
+    public void setFrustration(String frustration) {
+        this.frustration = frustration;
+    }
+    
+    @DynamoDBAttribute(attributeName = "stress")
     public String getStress() {
         return stress;
     }
 
+    public void setStress(String stress) {
+        this.stress = stress;
+    }
+    
+    @DynamoDBAttribute(attributeName = "relaxation")
     public String getRelaxation() {
         return relaxation;
     }
+
+    public void setRelaxation(String relaxation) {
+        this.relaxation = relaxation;
+    }
+    
 
     public byte[] toJsonAsBytes() {
         try {

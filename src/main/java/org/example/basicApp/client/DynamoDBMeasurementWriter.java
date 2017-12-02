@@ -23,16 +23,13 @@ import org.apache.commons.logging.LogFactory;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper.FailedBatch;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-
-import org.example.basicApp.model.MeasurementDynamoDB;
-import org.example.basicApp.client.DBWriter;
 import org.example.basicApp.model.VrMeasurement;
 
 /**
  * Persists counts to DynamoDB. This uses a separate thread to send counts to DynamoDB to decouple any network latency
  * from affecting the thread we use to update counts.
  */
-public class DynamoDBMeasurementWriter implements DBWriter<VrMeasurement> {
+public class DynamoDBMeasurementWriter {
 	
     private static final Log LOG = LogFactory.getLog(DynamoDBMeasurementWriter.class);
 
@@ -68,7 +65,6 @@ public class DynamoDBMeasurementWriter implements DBWriter<VrMeasurement> {
         this.mapper = mapper;
     }
 
-    @Override
     public void initialize() {
 
         // This thread is responsible for draining the queue of new counts and sending them in batches to DynamoDB
@@ -105,8 +101,7 @@ public class DynamoDBMeasurementWriter implements DBWriter<VrMeasurement> {
         dynamoDBSender.setDaemon(true);
         dynamoDBSender.start();
     }
- 
-    @Override
+
     public void pushToQueue (VrMeasurement measurementRecord) {
         if (measurementRecord == null) {
             // short circuit to avoid creating a map when we have no objects to persist
@@ -115,11 +110,10 @@ public class DynamoDBMeasurementWriter implements DBWriter<VrMeasurement> {
         Map<String, AttributeValue> item = newItem(measurementRecord);
         queue.add(item);
     }
-    
+   
     /**
      * We will block until the entire queue of counts has been drained.
      */
-    @Override
     public void checkpoint() throws InterruptedException {
         // We need to make sure all counts are flushed to DynamoDB before we return successfully.
         if (dynamoDBSender.isAlive()) {
@@ -143,6 +137,7 @@ public class DynamoDBMeasurementWriter implements DBWriter<VrMeasurement> {
      *        an optimization to avoid allocating a new buffer every interval.
      * @throws InterruptedException Thread interrupted while waiting for new data to arrive in the queue.
      */
+
     protected void sendQueueToDynamoDB(List<Map<String, AttributeValue>> buffer) throws InterruptedException {
         // Block while waiting for data
         buffer.add(queue.take());
@@ -165,15 +160,14 @@ public class DynamoDBMeasurementWriter implements DBWriter<VrMeasurement> {
             LOG.error("Error sending new counts to DynamoDB. The some counts may not be persisted.", ex);
         }
     }
+  
+    
     
     private static Map<String, AttributeValue> newItem(VrMeasurement record) {
     	
-    	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		//System.out.println(dateFormat.format(date));			
-		
-        Map<String, AttributeValue> item = new HashMap<String, AttributeValue>();
+    	Map<String, AttributeValue> item = new HashMap<String, AttributeValue>();
         item.put("resource", new AttributeValue(record.getResource()));
-        item.put("timestamp", new AttributeValue(dateFormat.format(record.getTimeStamp())));
+        item.put("timestamp", new AttributeValue(record.getTimeStamp()));
         item.put("host", new AttributeValue(record.getHost()));
         item.put("engagement", new AttributeValue(record.getEngagement()));
         item.put("focus", new AttributeValue(record.getFocus()));

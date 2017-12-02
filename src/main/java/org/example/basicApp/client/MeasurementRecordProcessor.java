@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
 import com.amazonaws.services.kinesis.clientlibrary.exceptions.InvalidStateException;
 import com.amazonaws.services.kinesis.clientlibrary.exceptions.ShutdownException;
 import com.amazonaws.services.kinesis.clientlibrary.exceptions.ThrottlingException;
@@ -33,7 +34,6 @@ import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessorC
 import com.amazonaws.services.kinesis.clientlibrary.types.ShutdownReason;
 import com.amazonaws.services.kinesis.model.Record;
 import org.example.basicApp.model.VrMeasurement;
-import org.example.basicApp.client.DBWriter;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -44,7 +44,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  * @param <T> The type of records this processor is capable of counting.
  */
-public class MeasurementRecordProcessor<T> implements IRecordProcessor {
+public class MeasurementRecordProcessor implements IRecordProcessor {
 
 	private static final Log LOG = LogFactory.getLog(MeasurementRecordProcessor.class);
     
@@ -53,12 +53,9 @@ public class MeasurementRecordProcessor<T> implements IRecordProcessor {
 
     // The shard this processor is processing
     private String kinesisShardId;
-
-    // The type of record we expect to receive as JSON
-    private Class<T> recordType;
     
     // This is responsible for writing record to dynamoDB every interval
-    private DBWriter<T> dbWriter;
+    private DynamoDBMeasurementWriter dbWriter;
 
     // Backoff and retry settings
     private static final long BACKOFF_TIME_IN_MILLIS = 3000L;
@@ -78,16 +75,12 @@ public class MeasurementRecordProcessor<T> implements IRecordProcessor {
      * @param computeRangeInMillis Range to compute distinct counts across
      * @param computeIntervalInMillis Interval between computing total count for the overall time range.
      */
-    public MeasurementRecordProcessor(Class<T> recordType, DBWriter<T> dbWriter) {
-    	
-        if (recordType == null) {
-            throw new NullPointerException("recordType must not be null");
-        }
+    public MeasurementRecordProcessor(DynamoDBMeasurementWriter dbWriter) {
+
         if (dbWriter == null) {
             throw new NullPointerException("dbWriter must not be null");
         }
         
-        this.recordType = recordType;
         this.dbWriter = dbWriter;
 
         // Create an object mapper to deserialize records that ignores unknown properties
@@ -149,10 +142,10 @@ public class MeasurementRecordProcessor<T> implements IRecordProcessor {
     public void processSingleRecord(Record r) {
      
         // Deserialize each record as an UTF-8 encoded JSON String of the type provided
-        T data = null;
+        VrMeasurement data = null;
         	
         try {
-           data = objectMapper.readValue(r.getData().array(), recordType);
+           data = objectMapper.readValue(r.getData().array(), VrMeasurement.class);
            //LOG.info(String.format("Measurement record read from stream is: %s \n", data.toString()));
            LOG.info(String.format("one record has been processed......... %s", data.toString()));
                

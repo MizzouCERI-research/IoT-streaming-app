@@ -17,7 +17,6 @@ package org.example.basicApp.client;
 
 import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessor;
 import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessorFactory;
-import org.example.basicApp.client.DBWriter;
 
 
 /**
@@ -25,11 +24,11 @@ import org.example.basicApp.client.DBWriter;
  *
  * @param <T> The type of records the processors this factory creates are capable of counting.
  */
-public class MeasurementRecordProcessorFactory<T> implements IRecordProcessorFactory {
+public class MeasurementRecordProcessorFactory implements IRecordProcessorFactory {
 	
 
-    private Class<T> recordType;
-    private DBWriter<T> dbWriter;
+    //private Class<T> recordType;
+    private DynamoDBMeasurementWriter dbWriter;
 
 
     /**
@@ -39,20 +38,17 @@ public class MeasurementRecordProcessorFactory<T> implements IRecordProcessorFac
      * @see #CountingRecordProcessorFactory(Class, CountPersister, int, int, CountingRecordProcessorConfig)
      */
 
-    public MeasurementRecordProcessorFactory(Class<T> recordType, DBWriter<T> dbWriter) {
-        if (recordType == null) {
-            throw new NullPointerException("recordType must not be null");
-        }
+    public MeasurementRecordProcessorFactory(DynamoDBMeasurementWriter dbWriter) {
+       
         if (dbWriter == null) {
             throw new NullPointerException("dbWriter must not be null");
         }
-        this.recordType = recordType;
         this.dbWriter = dbWriter;
 
     }
     
     @Override
     public IRecordProcessor createProcessor() {
-        return new MeasurementRecordProcessor<>(recordType, dbWriter);
+        return new MeasurementRecordProcessor(dbWriter);
     }
 }

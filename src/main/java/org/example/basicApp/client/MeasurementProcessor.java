@@ -87,7 +87,7 @@ public class MeasurementProcessor {
          
         
         IRecordProcessorFactory recordProcessorFactory =
-                new MeasurementRecordProcessorFactory<VrMeasurement>(VrMeasurement.class, dbWriter);
+                new MeasurementRecordProcessorFactory(dbWriter);
 
         Worker worker = new Worker(recordProcessorFactory, kclConfig);
 
