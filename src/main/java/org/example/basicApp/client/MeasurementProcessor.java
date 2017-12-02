@@ -83,8 +83,7 @@ public class MeasurementProcessor {
         
         // create a DB writer
         DynamoDBMeasurementWriter dbWriter =
-                new DynamoDBMeasurementWriter(dynamoDBUtils.createMapperForTable(dynamoTableName));
-         
+                new DynamoDBMeasurementWriter(dynamoDBUtils.createMapperForTable(dynamoTableName));         
         
         IRecordProcessorFactory recordProcessorFactory =
                 new MeasurementRecordProcessorFactory(dbWriter);

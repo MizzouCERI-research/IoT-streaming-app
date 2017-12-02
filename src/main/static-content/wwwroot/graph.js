@@ -1,17 +1,3 @@
-/*
- * Copyright 2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- * Licensed under the Amazon Software License (the "License").
- * You may not use this file except in compliance with the License.
- * A copy of the License is located at
- *
- * http://aws.amazon.com/asl/
- *
- * or in the "license" file accompanying this file. This file is distributed
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing
- * permissions and limitations under the License.
- */
 
 // When the page loads create our graph and start updating it.
 $(function() {
@@ -88,7 +74,7 @@ var Graph = function() {
 
       // Create y-axis label and inject it into the graph container
       var yaxisLabel = $("<div class='axisLabel yaxisLabel'></div>").text(
-          "Requests sent from referrer over 10 seconds").appendTo("#graph");
+          "Measurement sent from EEG sensor every 1 second").appendTo("#graph");
       // Center the y-axis along the left side of the graph
       yaxisLabel.css("margin-top", yaxisLabel.width() / 2 - 20);
     },
@@ -143,19 +129,16 @@ var Graph = function() {
  */
 var UIHelper = function(data, graph) {
   // How frequently should we poll for new data and update the graph?
-  var updateIntervalInMillis = 400;
-  // How often should the top N display be updated?
-  var intervalsPerTopNUpdate = 5;
+  var updateIntervalInMillis = 1000;
+
   // How far back should we fetch data at every interval?
   var rangeOfDataToFetchEveryIntervalInSeconds = 2;
-  // What should N be for our Top N display?
-  var topNToCalculate = 3;
-  // Keep track of when we last updated the top N display.
-  var topNIntervalCounter = 1;
+  
   // Controls the update loop.
   var running = true;
+  
   // Set the active resource to query for counts when updating data.
-  var activeResource = "/index.html";
+  var activeResource = "EEG sensor";
 
   /**
    * Fetch counts from the last secondsAgo seconds.
@@ -183,35 +166,11 @@ var UIHelper = function(data, graph) {
   }
 
   /**
-   * Update the top N display.
-   */
-  var updateTopN = function() {
-    var topN = data.getTopN(topNToCalculate);
-
-    var table = $("<table/>").addClass("topN");
-    $.each(topN, function(_, v) {
-      console.loog
-      var row = $("<tr/>");
-      row.append($("<td/>").addClass('referrerColumn').text(v.referrer));
-      row.append($("<td/>").addClass('countColumn').text(v.count));
-      table.append(row);
-    });
-
-    $("#topN").html(table);
-  }
-
-  /**
    * Update the graph with new data.
    */
   var update = function() {
     // Update our local data for the active resource
     updateData(activeResource, rangeOfDataToFetchEveryIntervalInSeconds);
-
-    // Update top N every intervalsPerTopNUpdate intervals
-    if (topNIntervalCounter++ % intervalsPerTopNUpdate == 0) {
-      updateTopN(data);
-      topNIntervalCounter = 1;
-    }
 
     // Update the graph with our new data, transformed into the data series
     // format Flot expects
@@ -269,10 +228,7 @@ var UIHelper = function(data, graph) {
     decorate : function() {
       setDescription("This graph displays the last "
           + graph.getTotalDurationToGraphInSeconds()
-          + " seconds of counts as calculated by the Amazon Kinesis Data Visualization Sample Application.");
-      $("#topNDescription").text(
-          "Top " + topNToCalculate + " referrers by counts (Updated every "
-              + (intervalsPerTopNUpdate * updateIntervalInMillis) + "ms):");
+          + " seconds of records as calculated by the Amazon Kinesis EEG Measurement Data Visualization Application.");   
     },
 
     /**
@@ -300,71 +256,6 @@ var UIHelper = function(data, graph) {
     }
   }
 };
-
-/**
- * Provides easy access to count data.
- */
-var CountDataProvider = function() {
-  var _endpoint = "http://" + location.host + "/api/GetCounts";
-
-  /**
-   * Builds a URL to fetch the number of counts for a given resource in the past
-   * range_in_seconds seconds.
-   *
-   * @param {string}
-   *          resource The resource to request counts for.
-   * @param {number}
-   *          range_in_seconds The range in seconds, since now, to request
-   *          counts for.
-   *
-   * @returns The URL to send a request for new data to.
-   */
-  buildUrl = function(resource, range_in_seconds) {
-    return _endpoint + "?resource=" + resource + "&range_in_seconds="
-        + range_in_seconds;
-  };
-
-  return {
-    /**
-     * Set the endpoint to request counts with.
-     */
-    setEndpoint : function(endpoint) {
-      _endpoint = endpoint;
-    },
-
-    /**
-     * Requests new data and passed it to the callback provided. The data is
-     * expected to be returned in the following format. Note: Referrer counts
-     * are ordered in descending order so the natural Top N can be derived per
-     * interval simply by using the first N elements of the referrerCounts
-     * array.
-     *
-     * [{
-     *   "resource" : "/index.html",
-     *   "timestamp" : 1397156430562,
-     *   "host" : "worker01-ec2",
-     *   "referrerCounts" : [
-     *     {"referrer":"http://www.amazon.com","count":1002},
-     *     {"referrer":"http://aws.amazon.com","count":901}
-     *   ]
-     * }]
-     *
-     * @param {string}
-     *          resource The resource to request counts for.
-     * @param {number}
-     *          range_in_seconds The range in seconds, since now, to request
-     *          counts for.
-     * @param {function}
-     *          callback The function to call when data has been returned from
-     *          the endpoint.
-     */
-    getData : function(resource, range_in_seconds, callback) {
-      $.ajax({
-        url : buildUrl(resource, range_in_seconds)
-      }).done(callback);
-    }
-  }
-}
 
 /**
  * Internal representation of count data. The data is stored in an associative
@@ -448,62 +339,6 @@ var CountData = function() {
       return totals;
     },
 
-    /**
-     * Compute local top N using the entire range of data we currently have.
-     *
-     * @param {number}
-     *          n The number of top referrers to calculate.
-     *
-     * @returns {object[]} The top referrers by count in descending order.
-     */
-    getTopN : function(n) {
-      // Create an array out of the totals so we can sort it
-      var totalsAsArray = $.map(totals, function(count, referrer) {
-        return {
-          'referrer' : referrer,
-          'count' : count
-        };
-      });
-      // Sort descending by count
-      var sorted = totalsAsArray.sort(function(a, b) {
-        return b.count - a.count;
-      });
-      // Return the first N
-      return sorted.slice(0, Math.min(n, sorted.length));
-    },
-
-    /**
-     * Merges new count data in to our existing data set.
-     *
-     * @param {object} Count data returned by our data provider.
-     */
-    addNewData : function(newCountData) {
-      // Expected data format:
-      // [{
-      //   "resource" : "/index.html",
-      //   "timestamp" : 1397156430562,
-      //   "host" : "worker01-ec2",
-      //   "referrerCounts" : [{"referrer":"http://www.amazon.com","count":1002}]
-      // }]
-      newCountData.forEach(function(count) {
-        // Update the host who last calculated the counts
-        setLastUpdatedBy(count.host);
-        // Add individual referrer counts
-        count.referrerCounts.forEach(function(refCount) {
-          // Reuse or create a new data series entry for this referrer
-          refData = data[refCount.referrer] || {
-            label : refCount.referrer,
-            data : {}
-          };
-          // Set the count
-          refData.data[count.timestamp] = refCount.count;
-          // Update the referrer data
-          data[refCount.referrer] = refData;
-          // Update our totals whenever new data is added
-          updateTotal(refCount.referrer);
-        });
-      });
-    },
 
     /**
      * Removes data older than a specific time. This will also prune referrers

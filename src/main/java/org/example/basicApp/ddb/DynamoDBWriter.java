@@ -3,9 +3,13 @@ package org.example.basicApp.ddb;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.example.basicApp.client.MeasurementProcessor;
 import org.example.basicApp.model.VrMeasurement;
+import org.example.basicApp.utils.DynamoDBUtils;
 import org.example.basicApp.utils.SampleUtils;
+import org.example.basicApp.utils.StreamUtils;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
@@ -15,7 +19,6 @@ import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.regions.Region;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 //import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
@@ -43,6 +46,8 @@ import com.amazonaws.services.kinesis.AmazonKinesisClient;
  * Amazon DynamoDB service.
  */
 public class DynamoDBWriter {
+	
+    private static final Log LOG = LogFactory.getLog(DynamoDBWriter.class);
 
     static AmazonDynamoDB dynamoDB;
         
@@ -53,35 +58,28 @@ public class DynamoDBWriter {
                 + "<DynamoDB table name> <region>");
         System.exit(1);
         }
-	    
+        
 	    String dynamoTableName = args[0];
 	    Region region = SampleUtils.parseRegion(args[1]);
+	    
+        AWSCredentialsProvider credentialsProvider = new DefaultAWSCredentialsProviderChain();
+        ClientConfiguration clientConfig = SampleUtils.configureUserAgentForSample(new ClientConfiguration());
+        AmazonKinesis kinesis = new AmazonKinesisClient(credentialsProvider, clientConfig);
+        kinesis.setRegion(region);
+        AmazonDynamoDB dynamoDB = new AmazonDynamoDBClient(credentialsProvider, clientConfig);
+        dynamoDB.setRegion(region);
+         
+        DynamoDBUtils dynamoDBUtils = new DynamoDBUtils(dynamoDB);
+        dynamoDBUtils.createDynamoTableIfNotExists(dynamoTableName);
+        LOG.info(String.format("%s DynamoDB table is ready for use", dynamoTableName));
 	
-	    AWSCredentialsProvider credentialsProvider = new DefaultAWSCredentialsProviderChain();
-	    ClientConfiguration clientConfig = SampleUtils.configureUserAgentForSample(new ClientConfiguration());
-	    AmazonKinesis kinesis = new AmazonKinesisClient(credentialsProvider, clientConfig);
-	    kinesis.setRegion(region);
-	    AmazonDynamoDB dynamoDB = new AmazonDynamoDBClient(credentialsProvider, clientConfig);
-	    dynamoDB.setRegion(region);
-
+        // Describe our new table
+        DescribeTableRequest describeTableRequest = new DescribeTableRequest().withTableName(dynamoTableName);
+        TableDescription tableDescription = dynamoDB.describeTable(describeTableRequest).getTable();
+        System.out.println("Table Description: " + tableDescription);
+        
         try {
-
-            // Create a table with a primary hash key named 'resource', which holds a string
-            CreateTableRequest createTableRequest = new CreateTableRequest().withTableName(dynamoTableName)
-                .withKeySchema(new KeySchemaElement().withAttributeName("resource").withKeyType(KeyType.HASH))
-                .withAttributeDefinitions(new AttributeDefinition().withAttributeName("resource").withAttributeType(ScalarAttributeType.S))
-                .withProvisionedThroughput(new ProvisionedThroughput().withReadCapacityUnits(1L).withWriteCapacityUnits(1L));
-
-            // Create table if it does not exist yet
-            TableUtils.createTableIfNotExists(dynamoDB, createTableRequest);
-            // wait for the table to move into ACTIVE state
-            TableUtils.waitUntilActive(dynamoDB, dynamoTableName);
-
-            // Describe our new table
-            DescribeTableRequest describeTableRequest = new DescribeTableRequest().withTableName(dynamoTableName);
-            TableDescription tableDescription = dynamoDB.describeTable(describeTableRequest).getTable();
-            System.out.println("Table Description: " + tableDescription);
-
+        	
             while(true) {
 	            
 	            // Add an item
@@ -95,7 +93,8 @@ public class DynamoDBWriter {
 	            
 	            PutItemRequest putItemRequest = new PutItemRequest(dynamoTableName, item);
 	            PutItemResult putItemResult = dynamoDB.putItem(putItemRequest);
-	            System.out.println("Result: " + putItemResult);	            
+	            System.out.println("Result: " + putItemResult);	 
+	            Thread.sleep(1000);
             }
 
         } catch (AmazonServiceException ase) {
