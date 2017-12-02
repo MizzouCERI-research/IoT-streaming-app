@@ -6,16 +6,21 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
+
+import org.example.basicApp.ddb.MeasurementRecordMarshaller;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMarshalling;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@DynamoDBTable(tableName = "measurementDBTable")
 public class VrMeasurement {
 
 	private static final float deviation = 0.1f;
@@ -36,7 +41,8 @@ public class VrMeasurement {
     private String stress;
     private String relaxation;
 
-   
+	private Map<String, AttributeValue> measurementValues;
+	
     public VrMeasurement() {
         
         Date date = new Date();
@@ -54,11 +60,13 @@ public class VrMeasurement {
         this.relaxation = getRandomFloat(0.7f).toString();
     }
     
+   
     @DynamoDBHashKey(attributeName = "resource")
     public String getResource() {
         return resource;
     }
 
+   
     public void setResource(String resource) {
         this.resource = resource;
     }
@@ -82,7 +90,7 @@ public class VrMeasurement {
         this.host = host;
     }
 
-    @DynamoDBAttribute(attributeName = "engagement")
+    //@DynamoDBAttribute(attributeName = "engagement")
     public String getEngagement() {
         return engagement;
     }
@@ -91,7 +99,7 @@ public class VrMeasurement {
         this.engagement = engagement;
     }
     
-    @DynamoDBAttribute(attributeName = "resource")
+    //@DynamoDBAttribute(attributeName = "focus")
     public String getFocus() {
         return focus;
     }
@@ -100,7 +108,7 @@ public class VrMeasurement {
         this.focus = focus;
     }
     
-    @DynamoDBAttribute(attributeName = "excitement")
+    //@DynamoDBAttribute(attributeName = "excitement")
     public String getExcitement() {
         return excitement;
     }
@@ -109,7 +117,7 @@ public class VrMeasurement {
         this.excitement = excitement;
     }
     
-    @DynamoDBAttribute(attributeName = "frustration")
+    //@DynamoDBAttribute(attributeName = "frustration")
     public String getFrustration() {
         return frustration;
     }
@@ -118,7 +126,7 @@ public class VrMeasurement {
         this.frustration = frustration;
     }
     
-    @DynamoDBAttribute(attributeName = "stress")
+    //@DynamoDBAttribute(attributeName = "stress")
     public String getStress() {
         return stress;
     }
@@ -126,8 +134,8 @@ public class VrMeasurement {
     public void setStress(String stress) {
         this.stress = stress;
     }
-    
-    @DynamoDBAttribute(attributeName = "relaxation")
+   
+    //@DynamoDBAttribute(attributeName = "relaxation")
     public String getRelaxation() {
         return relaxation;
     }
@@ -135,8 +143,29 @@ public class VrMeasurement {
     public void setRelaxation(String relaxation) {
         this.relaxation = relaxation;
     }
+  
+    @DynamoDBAttribute
+    @DynamoDBMarshalling(marshallerClass = MeasurementRecordMarshaller.class)
+    public Map<String, AttributeValue> getValues() {
+        return measurementValues;
+    }
     
-
+    public void setValues(VrMeasurement record) {
+  
+		//Map<String, AttributeValue> item = new HashMap<String, AttributeValue>();
+		
+		this.measurementValues.put("engagement", new AttributeValue(record.getEngagement()));
+		this.measurementValues.put("focus", new AttributeValue(record.getFocus()));
+		this.measurementValues.put("excitement", new AttributeValue(record.getExcitement()));
+		this.measurementValues.put("frustration", new AttributeValue(record.getFrustration()));
+		this.measurementValues.put("stress", new AttributeValue(record.getStress()));
+		this.measurementValues.put("relaxation", new AttributeValue(record.getRelaxation()));
+	}
+    
+    
+    
+    
+    
     public byte[] toJsonAsBytes() {
         try {
             return JSON.writeValueAsBytes(this);
@@ -144,7 +173,7 @@ public class VrMeasurement {
             return null;
         }
     }
-
+    
     public static VrMeasurement fromJsonAsBytes(byte[] bytes) {
         try {
             return JSON.readValue(bytes, VrMeasurement.class);

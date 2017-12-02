@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.example.basicApp.client.MeasurementProcessor;
+import org.example.basicApp.model.DdbRecordToWrite;
 import org.example.basicApp.model.VrMeasurement;
 import org.example.basicApp.utils.DynamoDBUtils;
 import org.example.basicApp.utils.SampleUtils;
@@ -85,7 +86,7 @@ public class DynamoDBWriter {
 	            // Add an item
 	            VrMeasurement measurementRecord =  new VrMeasurement();
 	            System.out.println("record generated: %s " + measurementRecord.toString());
-	            Map<String, AttributeValue> item = newItem(measurementRecord);
+	            DdbRecordToWrite item = new DdbRecordToWrite(measurementRecord);
 	            for (Map.Entry entry : item.entrySet())
 	            {
 	                System.out.println("key: " + entry.getKey() + "; value: " + entry.getValue());
@@ -112,30 +113,7 @@ public class DynamoDBWriter {
             System.out.println("Error Message: " + ace.getMessage());
         }
     }
-/*
-    private static Map<String, AttributeValue> newItem(String name, int year, String rating, String... fans) {
-        Map<String, AttributeValue> item = new HashMap<String, AttributeValue>();
-        item.put("name", new AttributeValue(name));
-        item.put("year", new AttributeValue().withN(Integer.toString(year)));
-        item.put("rating", new AttributeValue(rating));
-        item.put("fans", new AttributeValue().withSS(fans));
+    
 
-        return item;
-    }
-*/    
-    private static Map<String, AttributeValue> newItem(VrMeasurement record) {
-    	
-    	Map<String, AttributeValue> item = new HashMap<String, AttributeValue>();
-        item.put("resource", new AttributeValue(record.getResource()));
-        item.put("timestamp", new AttributeValue(record.getTimeStamp()));
-        item.put("host", new AttributeValue(record.getHost()));
-        item.put("engagement", new AttributeValue(record.getEngagement()));
-        item.put("focus", new AttributeValue(record.getFocus()));
-        item.put("excitement", new AttributeValue(record.getExcitement()));
-        item.put("frustration", new AttributeValue(record.getFrustration()));
-        item.put("stress", new AttributeValue(record.getStress()));
-        item.put("relaxation", new AttributeValue(record.getRelaxation()));
-
-        return item;
-    }
+	
 }
