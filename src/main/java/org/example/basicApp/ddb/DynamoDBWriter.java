@@ -148,7 +148,7 @@ public class DynamoDBWriter {
     	Map<String, AttributeValue> item = new HashMap<String, AttributeValue>();
         item.put("resource", new AttributeValue(record.getResource()));
         item.put("timestamp", new AttributeValue(record.getTimeStamp()));
-        item.put("wangso", new AttributeValue(record.getHost()));
+        item.put("host", new AttributeValue(record.getHost()));
         item.put("measurements", new AttributeValue(record.getValues().toString()));
 
 

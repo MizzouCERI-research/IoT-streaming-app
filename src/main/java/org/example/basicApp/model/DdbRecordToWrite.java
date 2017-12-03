@@ -53,7 +53,7 @@ public class DdbRecordToWrite {
 	    this.timestamp = timestamp;
 	}
 	
-	@DynamoDBAttribute(attributeName = "wangso")
+	@DynamoDBAttribute(attributeName = "host")
 	public String getHost() {
 	    return host;
 	}
