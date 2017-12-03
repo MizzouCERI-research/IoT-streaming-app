@@ -6,6 +6,9 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
 import com.amazonaws.services.dynamodbv2.model.Condition;
+
+import org.example.basicApp.model.DdbRecordToWrite;
+import org.example.basicApp.model.SingleMeasurementValue;
 import org.example.basicApp.model.VrMeasurement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -82,9 +85,9 @@ public class GetMeasurementServlet extends HttpServlet {
             LOG.debug(String.format("Querying for counts of resource %s since %s", resource, DATE_FORMATTER.get().format(startTime)));
         }
 
-        DynamoDBQueryExpression<VrMeasurement> query = new DynamoDBQueryExpression<>();
-        VrMeasurement hashKey = new VrMeasurement();
-        //hashKey.setResource(resource);
+        DynamoDBQueryExpression<DdbRecordToWrite> query = new DynamoDBQueryExpression<>();
+        DdbRecordToWrite hashKey = new DdbRecordToWrite();
+        hashKey.setResource(resource);
         query.setHashKeyValues(hashKey);
 
         Condition recentUpdates =
@@ -92,7 +95,7 @@ public class GetMeasurementServlet extends HttpServlet {
                         .withAttributeValueList(new AttributeValue().withS(DATE_FORMATTER.get().format(startTime)));
         query.setRangeKeyConditions(Collections.singletonMap("timestamp", recentUpdates));
 
-        List<VrMeasurement> counts = mapper.query(VrMeasurement.class, query);
+        List<DdbRecordToWrite> counts = mapper.query(DdbRecordToWrite.class, query);
 
         // Return the counts as JSON
         resp.setContentType("application/json");
