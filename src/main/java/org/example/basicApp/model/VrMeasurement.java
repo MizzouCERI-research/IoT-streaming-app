@@ -51,7 +51,7 @@ public class VrMeasurement {
         
         this.resource = "EEG sensor";
         this.timestamp = formattedDate;
-        this.host = "host";    	
+        this.host = "wangso";    	
     	this.engagement = getRandomFloat(0.9f).toString();
         this.focus = getRandomFloat(0.9f).toString();
         this.excitement = getRandomFloat(0.7f).toString();

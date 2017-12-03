@@ -53,7 +53,7 @@ public class DdbRecordToWrite {
 	    this.timestamp = timestamp;
 	}
 	
-	@DynamoDBAttribute(attributeName = "host")
+	@DynamoDBAttribute(attributeName = "wangso")
 	public String getHost() {
 	    return host;
 	}
@@ -62,7 +62,7 @@ public class DdbRecordToWrite {
         this.host = host;
     }
     
-    @DynamoDBAttribute(attributeName = "record in FLOT type")
+    @DynamoDBAttribute(attributeName = "measurements")
     @DynamoDBMarshalling(marshallerClass = MeasurementRecordMarshaller.class)
     public List<SingleMeasurementValue> getValues() {
         return measurementValues;

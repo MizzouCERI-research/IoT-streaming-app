@@ -74,7 +74,7 @@ var Graph = function() {
 
       // Create y-axis label and inject it into the graph container
       var yaxisLabel = $("<div class='axisLabel yaxisLabel'></div>").text(
-          "Measurement sent from EEG sensor every 1 second").appendTo("#graph");
+          "Measurements received from EEG sensor every second").appendTo("#graph");
       // Center the y-axis along the left side of the graph
       yaxisLabel.css("margin-top", yaxisLabel.width() / 2 - 20);
     },
@@ -129,14 +129,17 @@ var Graph = function() {
  */
 var UIHelper = function(data, graph) {
   // How frequently should we poll for new data and update the graph?
-  var updateIntervalInMillis = 1000;
-
+  var updateIntervalInMillis = 400;
+  // How often should the top N display be updated?
+  var intervalsPerTopNUpdate = 5;
   // How far back should we fetch data at every interval?
   var rangeOfDataToFetchEveryIntervalInSeconds = 2;
-  
+  // What should N be for our Top N display?
+  var topNToCalculate = 3;
+  // Keep track of when we last updated the top N display.
+  var topNIntervalCounter = 1;
   // Controls the update loop.
   var running = true;
-  
   // Set the active resource to query for counts when updating data.
   var activeResource = "EEG sensor";
 
@@ -166,11 +169,35 @@ var UIHelper = function(data, graph) {
   }
 
   /**
+   * Update the top N display.
+   */
+  var updateTopN = function() {
+    var topN = data.getTopN(topNToCalculate);
+
+    var table = $("<table/>").addClass("topN");
+    $.each(topN, function(_, v) {
+      console.loog
+      var row = $("<tr/>");
+      row.append($("<td/>").addClass('measurementColumn').text(v.measurement));
+      row.append($("<td/>").addClass('valueColumn').text(v.value));
+      table.append(row);
+    });
+
+    $("#topN").html(table);
+  }
+
+  /**
    * Update the graph with new data.
    */
   var update = function() {
     // Update our local data for the active resource
     updateData(activeResource, rangeOfDataToFetchEveryIntervalInSeconds);
+
+    // Update top N every intervalsPerTopNUpdate intervals
+    if (topNIntervalCounter++ % intervalsPerTopNUpdate == 0) {
+      updateTopN(data);
+      topNIntervalCounter = 1;
+    }
 
     // Update the graph with our new data, transformed into the data series
     // format Flot expects
@@ -228,7 +255,12 @@ var UIHelper = function(data, graph) {
     decorate : function() {
       setDescription("This graph displays the last "
           + graph.getTotalDurationToGraphInSeconds()
-          + " seconds of records as calculated by the Amazon Kinesis EEG Measurement Data Visualization Application.");   
+          + " seconds of EEG sensor measurement records.");
+      
+      $("#topNDescription").text(
+          "Top " + topNToCalculate + " referrers by counts (Updated every "
+              + (intervalsPerTopNUpdate * updateIntervalInMillis) + "ms):");
+      
     },
 
     /**
@@ -256,6 +288,71 @@ var UIHelper = function(data, graph) {
     }
   }
 };
+
+/**
+ * Provides easy access to count data.
+ */
+var CountDataProvider = function() {
+  var _endpoint = "http://" + location.host + "/api/GetCounts";
+
+  /**
+   * Builds a URL to fetch the number of counts for a given resource in the past
+   * range_in_seconds seconds.
+   *
+   * @param {string}
+   *          resource The resource to request counts for.
+   * @param {number}
+   *          range_in_seconds The range in seconds, since now, to request
+   *          counts for.
+   *
+   * @returns The URL to send a request for new data to.
+   */
+  buildUrl = function(resource, range_in_seconds) {
+    return _endpoint + "?resource=" + resource + "&range_in_seconds="
+        + range_in_seconds;
+  };
+
+  return {
+    /**
+     * Set the endpoint to request counts with.
+     */
+    setEndpoint : function(endpoint) {
+      _endpoint = endpoint;
+    },
+
+    /**
+     * Requests new data and passed it to the callback provided. The data is
+     * expected to be returned in the following format. Note: Referrer counts
+     * are ordered in descending order so the natural Top N can be derived per
+     * interval simply by using the first N elements of the referrerCounts
+     * array.
+     *
+     * [{
+     *   "resource" : "/index.html",
+     *   "timestamp" : 1397156430562,
+     *   "host" : "worker01-ec2",
+     *   "referrerCounts" : [
+     *     {"referrer":"http://www.amazon.com","count":1002},
+     *     {"referrer":"http://aws.amazon.com","count":901}
+     *   ]
+     * }]
+     *
+     * @param {string}
+     *          resource The resource to request counts for.
+     * @param {number}
+     *          range_in_seconds The range in seconds, since now, to request
+     *          counts for.
+     * @param {function}
+     *          callback The function to call when data has been returned from
+     *          the endpoint.
+     */
+    getData : function(resource, range_in_seconds, callback) {
+      $.ajax({
+        url : buildUrl(resource, range_in_seconds)
+      }).done(callback);
+    }
+  }
+}
 
 /**
  * Internal representation of count data. The data is stored in an associative
@@ -292,17 +389,17 @@ var CountData = function() {
    * @param {string}
    *          referrer Referrer to update the total for.
    */
-  var updateTotal = function(referrer) {
+  var updateTotal = function(measurement) {
     // Simply loop through all the counts and sum them if there is data for this
     // referrer
-    if (data[referrer]) {
-      totals[referrer] = 0;
-      $.each(data[referrer].data, function(ts, count) {
-        totals[referrer] += count;
+    if (data[measurement]) {
+      totals[measurement] = 0;
+      $.each(data[measurement].data, function(ts, value) {
+        totals[measurement] = value;
       });
     } else {
       // No data for the referrer, remove the total if it exists
-      delete totals[referrer];
+      delete totals[measurement];
     }
   }
 
@@ -339,6 +436,62 @@ var CountData = function() {
       return totals;
     },
 
+    /**
+     * Compute local top N using the entire range of data we currently have.
+     *
+     * @param {number}
+     *          n The number of top referrers to calculate.
+     *
+     * @returns {object[]} The top referrers by count in descending order.
+     */
+    getTopN : function(n) {
+      // Create an array out of the totals so we can sort it
+      var totalsAsArray = $.map(totals, function(value, measurement) {
+        return {
+          'measurement' : measurement,
+          'measurement' : value
+        };
+      });
+      // Sort descending by count
+      var sorted = totalsAsArray.sort(function(a, b) {
+        return b.count - a.count;
+      });
+      // Return the first N
+      return sorted.slice(0, Math.min(n, sorted.length));
+    },
+
+    /**
+     * Merges new count data in to our existing data set.
+     *
+     * @param {object} Count data returned by our data provider.
+     */
+    addNewData : function(newCountData) {
+      // Expected data format:
+      // [{
+      //   "resource" : "EEG sensor",
+      //   "timestamp" : 1397156430562,
+      //   "host" : "worker01-ec2",
+      //   "measurements" : [{"measurement":"engagement","value":0.8895654}]
+      // }]
+      newCountData.forEach(function(value) {
+        // Update the host who last calculated the counts
+        setLastUpdatedBy(value.host);
+        // Add individual referrer counts
+        value.measurements.forEach(function(measurementValue) {
+          // Reuse or create a new data series entry for this referrer
+          measureData = data[measurementValue.measurement] || {
+            label : measurementValue.measurement,
+            data : {}
+          };
+          // Set the count
+          measureData.data[value.timestamp] = measurementValue.value;
+          // Update the referrer data
+          data[measurementValue.measurement] = measureData;
+          // Update our totals whenever new data is added
+          updateTotal(measurementValue.measurement);
+        });
+      });
+    },
 
     /**
      * Removes data older than a specific time. This will also prune referrers
@@ -349,27 +502,27 @@ var CountData = function() {
      */
     removeDataOlderThan : function(timestamp) {
       // For each referrer
-      $.each(data, function(referrer, referrerData) {
+      $.each(data, function(measurement, measurementData) {
         var shouldUpdateTotals = false;
         // For each data point
-        $.each(referrerData.data, function(ts, count) {
+        $.each(measurementData.data, function(ts, value) {
           // If the data point is older than the provided time
           if (ts < timestamp) {
             // Remove the timestamp from the data
-            delete referrerData.data[ts];
+            delete measurementData.data[ts];
             // Indicate we need to update the totals for the referrer since we
             // removed data
             shouldUpdateTotals = true;
             // If the referrer has no more data remove the referrer entirely
-            if (Object.keys(referrerData.data).length == 0) {
+            if (Object.keys(measurementData.data).length == 0) {
               // Remove the empty referrer - it has no more data
-              delete data[referrer];
+              delete data[measurement];
             }
           }
         });
         if (shouldUpdateTotals) {
           // Update the totals if we removed any data
-          updateTotal(referrer);
+          //updateTotal(measurement);
         }
       });
     },
@@ -379,15 +532,16 @@ var CountData = function() {
      *
      * @returns {object[]} Array of data series for every referrer we know of.
      */
+    
     toFlotData : function() {
       flotData = [];
-      $.each(data, function(referrer, referrerData) {
+      $.each(data, function(measurement, measurementData) {
         flotData.push({
-          label : referrer,
+          label : measurement,
           // Flot expects time series data to be in the format:
           // [[timestamp as number, value]]
-          data : $.map(referrerData.data, function(count, ts) {
-            return [ [ parseInt(ts), count ] ];
+          data : $.map(measurementData.data, function(value, ts) {
+            return [ [ parseInt(ts), value ] ];
           })
         });
       });
