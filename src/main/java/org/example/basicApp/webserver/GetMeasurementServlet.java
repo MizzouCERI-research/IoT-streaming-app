@@ -68,6 +68,8 @@ public class GetMeasurementServlet extends HttpServlet {
         MultiMap<String> params = new MultiMap<>();
         UrlEncoded.decodeTo(req.getQueryString(), params, "UTF-8");
 
+        LOG.info(String.format("params include: %s \n", params.toString()));
+        
         // We need both parameters to properly query for counts
         if (!params.containsKey(PARAMETER_RESOURCE) || !params.containsKey(PARAMETER_RANGE_IN_SECONDS)) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
