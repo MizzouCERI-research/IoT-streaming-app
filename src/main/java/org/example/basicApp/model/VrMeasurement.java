@@ -40,8 +40,8 @@ public class VrMeasurement {
     private String frustration;
     private String stress;
     private String relaxation;
+	//private Map<String, AttributeValue> measurementValues;
 
-	private Map<String, AttributeValue> measurementValues;
 	
     public VrMeasurement() {
         
@@ -57,11 +57,12 @@ public class VrMeasurement {
         this.excitement = getRandomFloat(0.7f).toString();
         this.frustration = getRandomFloat(0.2f).toString();
         this.stress = getRandomFloat(0.1f).toString();
-        this.relaxation = getRandomFloat(0.7f).toString();
+        this.relaxation = getRandomFloat(0.7f).toString();        
     }
+ 
+
     
-   
-    @DynamoDBHashKey(attributeName = "resource")
+    //@DynamoDBHashKey(attributeName = "resource")
     public String getResource() {
         return resource;
     }
@@ -72,7 +73,7 @@ public class VrMeasurement {
     }
 
 
-    @DynamoDBRangeKey(attributeName = "timestamp")
+    //@DynamoDBRangeKey(attributeName = "timestamp")
     public String getTimeStamp() {
         return timestamp;
     }
@@ -81,7 +82,7 @@ public class VrMeasurement {
         this.timestamp = timestamp;
     }
 
-    @DynamoDBAttribute(attributeName = "host")
+    //@DynamoDBAttribute(attributeName = "host")
     public String getHost() {
         return host;
     }
@@ -144,28 +145,23 @@ public class VrMeasurement {
         this.relaxation = relaxation;
     }
   
-    @DynamoDBAttribute
-    @DynamoDBMarshalling(marshallerClass = MeasurementRecordMarshaller.class)
+/*
+    //@DynamoDBAttribute(attributeName = "record in FLOT type")
+    //@DynamoDBMarshalling(marshallerClass = MeasurementRecordMarshaller.class)
     public Map<String, AttributeValue> getValues() {
         return measurementValues;
     }
     
-    public void setValues(VrMeasurement record) {
-  
-		//Map<String, AttributeValue> item = new HashMap<String, AttributeValue>();
-		
-		this.measurementValues.put("engagement", new AttributeValue(record.getEngagement()));
-		this.measurementValues.put("focus", new AttributeValue(record.getFocus()));
-		this.measurementValues.put("excitement", new AttributeValue(record.getExcitement()));
-		this.measurementValues.put("frustration", new AttributeValue(record.getFrustration()));
-		this.measurementValues.put("stress", new AttributeValue(record.getStress()));
-		this.measurementValues.put("relaxation", new AttributeValue(record.getRelaxation()));
-	}
+    public void setValues() {
     
-    
-    
-    
-    
+		this.measurementValues.put("engagement", new AttributeValue(this.engagement));
+		this.measurementValues.put("focus", new AttributeValue(this.focus));
+		this.measurementValues.put("excitement", new AttributeValue(this.excitement));
+		this.measurementValues.put("frustration", new AttributeValue(this.frustration));
+		this.measurementValues.put("stress", new AttributeValue(this.stress));
+		this.measurementValues.put("relaxation", new AttributeValue(this.relaxation));
+	}   
+*/    
     public byte[] toJsonAsBytes() {
         try {
             return JSON.writeValueAsBytes(this);

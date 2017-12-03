@@ -1,12 +1,15 @@
 package org.example.basicApp.ddb;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.example.basicApp.client.MeasurementProcessor;
 import org.example.basicApp.model.DdbRecordToWrite;
+import org.example.basicApp.model.SingleMeasurementValue;
 import org.example.basicApp.model.VrMeasurement;
 import org.example.basicApp.utils.DynamoDBUtils;
 import org.example.basicApp.utils.SampleUtils;
@@ -85,8 +88,33 @@ public class DynamoDBWriter {
 	            
 	            // Add an item
 	            VrMeasurement measurementRecord =  new VrMeasurement();
-	            System.out.println("record generated: %s " + measurementRecord.toString());
-	            DdbRecordToWrite item = new DdbRecordToWrite(measurementRecord);
+	            System.out.printf("record generated is: %s \n" , measurementRecord.toString());
+
+	            DdbRecordToWrite ddbRecordToWrite = new DdbRecordToWrite();
+	            ddbRecordToWrite.setResource(measurementRecord.getResource());
+	            ddbRecordToWrite.setTimeStamp(measurementRecord.getTimeStamp());
+	            ddbRecordToWrite.setHost(measurementRecord.getHost());
+	            
+	        	List<SingleMeasurementValue> measurementValues = new ArrayList<SingleMeasurementValue>();
+	           	SingleMeasurementValue value1 = new SingleMeasurementValue("{\"measurement\":\"engagement\",\"value\":", measurementRecord.getEngagement()+"}");
+	        	SingleMeasurementValue value2 = new SingleMeasurementValue("{\"measurement\":\"focus\",\"value\":", measurementRecord.getFocus()+"}");
+	        	SingleMeasurementValue value3 = new SingleMeasurementValue("{\"measurement\":\"excitement\",\"value\":", measurementRecord.getExcitement()+"}");
+	        	SingleMeasurementValue value4 = new SingleMeasurementValue("{\"measurement\":\"frustration\",\"value\":", measurementRecord.getFrustration()+"}");
+	        	SingleMeasurementValue value5 = new SingleMeasurementValue("{\"measurement\":\"stress\",\"value\":", measurementRecord.getStress()+"}");
+	        	SingleMeasurementValue value6 = new SingleMeasurementValue("{\"measurement\":\"relaxation\",\"value\":", measurementRecord.getRelaxation()+"}");
+	        	measurementValues.add(value1);
+	    		measurementValues.add(value2);
+	    		measurementValues.add(value3);
+	    		measurementValues.add(value4);
+	    		measurementValues.add(value5);
+	    		measurementValues.add(value6);
+	    		
+	            ddbRecordToWrite.setValues(measurementValues);		            	            
+	            
+	            System.out.printf("record ready to write is: %s \n" , ddbRecordToWrite.toString());
+
+	            
+	            Map<String, AttributeValue> item = newItem(ddbRecordToWrite);
 	            for (Map.Entry entry : item.entrySet())
 	            {
 	                System.out.println("key: " + entry.getKey() + "; value: " + entry.getValue());
@@ -114,6 +142,18 @@ public class DynamoDBWriter {
         }
     }
     
+    
+    private static Map<String, AttributeValue> newItem(DdbRecordToWrite record) {
+    	
+    	Map<String, AttributeValue> item = new HashMap<String, AttributeValue>();
+        item.put("resource", new AttributeValue(record.getResource()));
+        item.put("timestamp", new AttributeValue(record.getTimeStamp()));
+        item.put("host", new AttributeValue(record.getHost()));
+        item.put("record in FLOT type", new AttributeValue(record.getValues().toString()));
 
+
+        return item;
+    }
+    
 	
 }

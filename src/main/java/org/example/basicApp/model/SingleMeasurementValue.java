@@ -1,9 +1,10 @@
 package org.example.basicApp.model;
 
 public class SingleMeasurementValue {
-/*	
+	
 	private String measurementName;
 	private String value;
+
 	
 	public SingleMeasurementValue (String name, String value) {
 		
@@ -34,5 +35,9 @@ public class SingleMeasurementValue {
 		this.value = value;
 	}
 	
-*/	
+   @Override
+    public String toString() {
+        return String.format("%s %s \n",measurementName, value);
+    }
+
 }
