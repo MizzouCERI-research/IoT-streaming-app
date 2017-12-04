@@ -91,11 +91,6 @@ var Graph = function() {
     update : function(flotData) {
       graph.setData(flotData);
       
-      str = JSON.stringify(flotData);
-      //console.log(str);
-      alert(str);
-      // Tested, new count data format is good! 
-      
       // Calculate min and max value to update y-axis range.
       var getValue = function(tuple) {
         // Flot data values are stored as the second element of each data array
@@ -482,13 +477,7 @@ var CountData = function() {
       //   "values" : [{"measurement":"engagement","value":0.8895654}]
       // }]
     	
-       //str = JSON.stringify(newCountData);
-       //console.log(str);
-       //alert(str);
-       // Tested, new count data format is good! 
-    	
-    	
-      newCountData.forEach(function(record) {
+    	newCountData.forEach(function(record) {
         // Update the host who last calculated the counts
         setLastUpdatedBy(record.host);
         // Add individual referrer counts
