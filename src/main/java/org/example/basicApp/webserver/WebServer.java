@@ -74,7 +74,7 @@ public class WebServer {
         DynamoDBUtils dynamoDBUtils = new DynamoDBUtils(dynamoDB);
         context.addServlet(new ServletHolder(new GetMeasurementServlet(dynamoDBUtils.createMapperForTable(countsTableName))),
                 "/GetCounts/*");
-
+                
         HandlerList handlers = new HandlerList();
         handlers.addHandler(context);
         handlers.addHandler(resources);

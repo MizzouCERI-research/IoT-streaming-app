@@ -257,9 +257,7 @@ var UIHelper = function(data, graph) {
           + graph.getTotalDurationToGraphInSeconds()
           + " seconds of EEG sensor measurement records.");
       
-      $("#topNDescription").text(
-          "Top " + topNToCalculate + " referrers by counts (Updated every "
-              + (intervalsPerTopNUpdate * updateIntervalInMillis) + "ms):");
+      $("#topNDescription").text("");
       
     },
 
@@ -471,24 +469,26 @@ var CountData = function() {
       //   "resource" : "EEG sensor",
       //   "timestamp" : 1397156430562,
       //   "host" : "worker01-ec2",
-      //   "measurements" : [{"measurement":"engagement","value":0.8895654}]
+      //   "values" : [{"measurement":"engagement","value":0.8895654}]
       // }]
-      newCountData.forEach(function(value) {
+      newCountData.forEach(function(record) {
         // Update the host who last calculated the counts
-        setLastUpdatedBy(value.host);
+        setLastUpdatedBy(record.host);
         // Add individual referrer counts
-        value.measurements.forEach(function(measurementValue) {
+        record.values.forEach(function(measurementValue) {
           // Reuse or create a new data series entry for this referrer
           measureData = data[measurementValue.measurement] || {
             label : measurementValue.measurement,
             data : {}
           };
           // Set the count
-          measureData.data[value.timestamp] = measurementValue.value;
+          measureData.data[record.timestamp] = measurementValue.value;
+          
+          console.log(measureData.data[record.timestamp]);
           // Update the referrer data
           data[measurementValue.measurement] = measureData;
           // Update our totals whenever new data is added
-          updateTotal(measurementValue.measurement);
+          //updateTotal(measurementValue.measurement);
         });
       });
     },
@@ -508,15 +508,16 @@ var CountData = function() {
         $.each(measurementData.data, function(ts, value) {
           // If the data point is older than the provided time
           if (ts < timestamp) {
-            // Remove the timestamp from the data
-            delete measurementData.data[ts];
+            // Remove the timestamp from the data        	  
+            //delete measurementData.data[ts];
+        	  
             // Indicate we need to update the totals for the referrer since we
             // removed data
             shouldUpdateTotals = true;
             // If the referrer has no more data remove the referrer entirely
             if (Object.keys(measurementData.data).length == 0) {
               // Remove the empty referrer - it has no more data
-              delete data[measurement];
+              //delete data[measurement];
             }
           }
         });

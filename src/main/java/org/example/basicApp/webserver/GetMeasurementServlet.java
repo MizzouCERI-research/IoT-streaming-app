@@ -75,7 +75,7 @@ public class GetMeasurementServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-
+        
         // Parse query string as a single integer - the number of seconds since "now" to query for new counts
         String resource = params.getString(PARAMETER_RESOURCE);
         int rangeInSeconds = Integer.parseInt(params.getString(PARAMETER_RANGE_IN_SECONDS));
@@ -97,11 +97,19 @@ public class GetMeasurementServlet extends HttpServlet {
                         .withAttributeValueList(new AttributeValue().withS(DATE_FORMATTER.get().format(startTime)));
         query.setRangeKeyConditions(Collections.singletonMap("timestamp", recentUpdates));
 
-        List<DdbRecordToWrite> counts = mapper.query(DdbRecordToWrite.class, query);
-
+        List<DdbRecordToWrite> queryRecords = mapper.query(DdbRecordToWrite.class, query);
+        
+        //for debugging purpose only
+        DdbRecordToWrite lastElement = queryRecords.iterator().next();        
+        LOG.info(String.format("record include: %s \n", lastElement.getValues().toString()));
+        
+        
         // Return the counts as JSON
         resp.setContentType("application/json");
         resp.setStatus(HttpServletResponse.SC_OK);
-        JSON.writeValue(resp.getWriter(), counts);
+        JSON.writeValue(resp.getWriter(), queryRecords);
+        
+        //LOG.info(String.format("record include: %s \n", JSON.toString()));
+
     }
 }
