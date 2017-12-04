@@ -73,7 +73,7 @@ public class WebServer {
         dynamoDB.setRegion(region);
         DynamoDBUtils dynamoDBUtils = new DynamoDBUtils(dynamoDB);
         context.addServlet(new ServletHolder(new GetMeasurementServlet(dynamoDBUtils.createMapperForTable(countsTableName))),
-                "/GetCounts/*");
+                "/GetMeasurements/*");
                 
         HandlerList handlers = new HandlerList();
         handlers.addHandler(context);

@@ -129,13 +129,13 @@ var Graph = function() {
  */
 var UIHelper = function(data, graph) {
   // How frequently should we poll for new data and update the graph?
-  var updateIntervalInMillis = 400;
+  var updateIntervalInMillis = 1000;
   // How often should the top N display be updated?
   var intervalsPerTopNUpdate = 5;
   // How far back should we fetch data at every interval?
-  var rangeOfDataToFetchEveryIntervalInSeconds = 2;
+  var rangeOfDataToFetchEveryIntervalInSeconds = 5;
   // What should N be for our Top N display?
-  var topNToCalculate = 3;
+  var topNToCalculate = 6;
   // Keep track of when we last updated the top N display.
   var topNIntervalCounter = 1;
   // Controls the update loop.
@@ -257,7 +257,8 @@ var UIHelper = function(data, graph) {
           + graph.getTotalDurationToGraphInSeconds()
           + " seconds of EEG sensor measurement records.");
       
-      $("#topNDescription").text("");
+      $("#topNDescription").text("Average values of all " + topNToCalculate + " measurements in the recent "
+              + (intervalsPerTopNUpdate * updateIntervalInMillis) + " ms: ");
       
     },
 
@@ -291,7 +292,7 @@ var UIHelper = function(data, graph) {
  * Provides easy access to count data.
  */
 var CountDataProvider = function() {
-  var _endpoint = "http://" + location.host + "/api/GetCounts";
+  var _endpoint = "http://" + location.host + "/api/GetMeasurements";
 
   /**
    * Builds a URL to fetch the number of counts for a given resource in the past
@@ -393,11 +394,11 @@ var CountData = function() {
     if (data[measurement]) {
       totals[measurement] = 0;
       $.each(data[measurement].data, function(ts, value) {
-        totals[measurement] = value;
+        totals[measurement] += value;
       });
     } else {
       // No data for the referrer, remove the total if it exists
-      delete totals[measurement];
+      // delete totals[measurement];
     }
   }
 
@@ -447,7 +448,7 @@ var CountData = function() {
       var totalsAsArray = $.map(totals, function(value, measurement) {
         return {
           'measurement' : measurement,
-          'measurement' : value
+          'value' : value
         };
       });
       // Sort descending by count
@@ -484,11 +485,10 @@ var CountData = function() {
           // Set the count
           measureData.data[record.timestamp] = measurementValue.value;
           
-          console.log(measureData.data[record.timestamp]);
           // Update the referrer data
           data[measurementValue.measurement] = measureData;
           // Update our totals whenever new data is added
-          //updateTotal(measurementValue.measurement);
+          updateTotal(measurementValue.measurement);
         });
       });
     },
@@ -502,7 +502,7 @@ var CountData = function() {
      */
     removeDataOlderThan : function(timestamp) {
       // For each referrer
-      $.each(data, function(measurement, measurementData) {
+        $.each(data, function(measurement, measurementData) {
         var shouldUpdateTotals = false;
         // For each data point
         $.each(measurementData.data, function(ts, value) {
@@ -523,7 +523,7 @@ var CountData = function() {
         });
         if (shouldUpdateTotals) {
           // Update the totals if we removed any data
-          //updateTotal(measurement);
+          updateTotal(measurement);
         }
       });
     },
@@ -536,12 +536,14 @@ var CountData = function() {
     
     toFlotData : function() {
       flotData = [];
-      $.each(data, function(measurement, measurementData) {
+      //$.each(data, function(measurement, measurementData) {
+      $.each(data, function(measurement, measureData) {
         flotData.push({
           label : measurement,
           // Flot expects time series data to be in the format:
           // [[timestamp as number, value]]
-          data : $.map(measurementData.data, function(value, ts) {
+          //data : $.map(measurementData.data, function(value, ts) {
+            data : $.map(measureData.data, function(value, ts) {
             return [ [ parseInt(ts), value ] ];
           })
         });
