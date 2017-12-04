@@ -1,11 +1,14 @@
 package org.example.basicApp.ddb;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -84,7 +87,6 @@ public class DynamoDBWriter {
         TableDescription tableDescription = dynamoDB.describeTable(describeTableRequest).getTable();
         System.out.println("Table Description: " + tableDescription);
         
-        Date date = new Date();
         try {
         	
             while(true) {
@@ -95,10 +97,12 @@ public class DynamoDBWriter {
 
 	            DdbRecordToWrite ddbRecordToWrite = new DdbRecordToWrite();
 	            ddbRecordToWrite.setResource(measurementRecord.getResource());
-	            ddbRecordToWrite.setTimeStamp(measurementRecord.getTimeStamp());
+	            //ddbRecordToWrite.setTimeStamp(measurementRecord.getTimeStamp());
 	            ddbRecordToWrite.setHost(measurementRecord.getHost());
-	            //date.setTime(System.currentTimeMillis());
-	            //ddbRecordToWrite.setTimeStamp(date);
+	            
+	            Date date = new Date();
+	            date.setTime(System.currentTimeMillis());
+	            ddbRecordToWrite.setTimeStamp(toISO8601UTC(date));
 	            
 	        	List<SingleMeasurementValue> measurementValues = new ArrayList<SingleMeasurementValue>();
 	           	SingleMeasurementValue value1 = new SingleMeasurementValue("{\"measurement\":\"engagement\",\"value\":", getRandomFloat(0.9f),"}");
@@ -150,16 +154,25 @@ public class DynamoDBWriter {
     
     private static Map<String, AttributeValue> newItem(DdbRecordToWrite record) {
     	
+    	
+    	
     	Map<String, AttributeValue> item = new HashMap<String, AttributeValue>();
         item.put("resource", new AttributeValue(record.getResource()));
         item.put("timestamp", new AttributeValue(record.getTimeStamp()));
         item.put("host", new AttributeValue(record.getHost()));
-        item.put("measurements", new AttributeValue(record.getValues().toString()));
+        item.put("values", new AttributeValue(record.getValues().toString()));
 
 
         return item;
     }
     
+    public static String toISO8601UTC(Date date) {
+    	  TimeZone tz = TimeZone.getTimeZone("UTC");
+    	  DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    	  df.setTimeZone(tz);
+    	  return df.format(date);
+    	}
+        
     public static Float getRandomFloat(Float mean) {
     	
     	Random rand = new Random();	

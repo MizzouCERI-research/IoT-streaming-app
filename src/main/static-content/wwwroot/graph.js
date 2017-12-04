@@ -90,7 +90,12 @@ var Graph = function() {
      */
     update : function(flotData) {
       graph.setData(flotData);
-
+      
+      str = JSON.stringify(flotData);
+      //console.log(str);
+      alert(str);
+      // Tested, new count data format is good! 
+      
       // Calculate min and max value to update y-axis range.
       var getValue = function(tuple) {
         // Flot data values are stored as the second element of each data array
@@ -158,6 +163,9 @@ var UIHelper = function(data, graph) {
     provider.getData(resource, secondsAgo, function(newData) {
       // Store the data locally
       data.addNewData(newData);
+      //str = JSON.stringify(newData);
+      //console.log(str);
+      //alert(str);
       // Remove data that's outside the window of data we are displaying. This
       // is unnecessary to keep around.
       data.removeDataOlderThan((new Date()).getTime()
@@ -198,7 +206,8 @@ var UIHelper = function(data, graph) {
       updateTopN(data);
       topNIntervalCounter = 1;
     }
-
+   
+    
     // Update the graph with our new data, transformed into the data series
     // format Flot expects
     graph.update(data.toFlotData());
@@ -394,7 +403,7 @@ var CountData = function() {
     if (data[measurement]) {
       totals[measurement] = 0;
       $.each(data[measurement].data, function(ts, value) {
-        totals[measurement] += value;
+        totals[measurement] = value;
       });
     } else {
       // No data for the referrer, remove the total if it exists
@@ -472,6 +481,13 @@ var CountData = function() {
       //   "host" : "worker01-ec2",
       //   "values" : [{"measurement":"engagement","value":0.8895654}]
       // }]
+    	
+       //str = JSON.stringify(newCountData);
+       //console.log(str);
+       //alert(str);
+       // Tested, new count data format is good! 
+    	
+    	
       newCountData.forEach(function(record) {
         // Update the host who last calculated the counts
         setLastUpdatedBy(record.host);
@@ -542,9 +558,9 @@ var CountData = function() {
           label : measurement,
           // Flot expects time series data to be in the format:
           // [[timestamp as number, value]]
-          //data : $.map(measurementData.data, function(value, ts) {
-            data : $.map(measureData.data, function(value, ts) {
-            return [ [ parseInt(ts), value ] ];
+          data : $.map(measureData.data, function(value, ts) {
+          //data : $.map(measureData.data, function(value, ts) {
+          return [ [ parseInt(ts), value ] ];
           })
         });
       });

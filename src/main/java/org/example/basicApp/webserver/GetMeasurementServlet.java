@@ -7,6 +7,7 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
 import com.amazonaws.services.dynamodbv2.model.Condition;
 
+import org.example.basicApp.model.DdbRecordToRead;
 import org.example.basicApp.model.DdbRecordToWrite;
 import org.example.basicApp.model.SingleMeasurementValue;
 import org.example.basicApp.model.VrMeasurement;
@@ -68,7 +69,7 @@ public class GetMeasurementServlet extends HttpServlet {
         MultiMap<String> params = new MultiMap<>();
         UrlEncoded.decodeTo(req.getQueryString(), params, "UTF-8");
 
-        LOG.info(String.format("params include: %s \n", params.toString()));
+        //LOG.info(String.format("params include: %s \n", params.toString()));
         
         // We need both parameters to properly query for counts
         if (!params.containsKey(PARAMETER_RESOURCE) || !params.containsKey(PARAMETER_RANGE_IN_SECONDS)) {
@@ -87,8 +88,8 @@ public class GetMeasurementServlet extends HttpServlet {
             LOG.debug(String.format("Querying for counts of resource %s since %s", resource, DATE_FORMATTER.get().format(startTime)));
         }
 
-        DynamoDBQueryExpression<DdbRecordToWrite> query = new DynamoDBQueryExpression<>();
-        DdbRecordToWrite hashKey = new DdbRecordToWrite();
+        DynamoDBQueryExpression<DdbRecordToRead> query = new DynamoDBQueryExpression<>();
+        DdbRecordToRead hashKey = new DdbRecordToRead();
         hashKey.setResource(resource);
         query.setHashKeyValues(hashKey);
 
@@ -97,14 +98,14 @@ public class GetMeasurementServlet extends HttpServlet {
                         .withAttributeValueList(new AttributeValue().withS(DATE_FORMATTER.get().format(startTime)));
         query.setRangeKeyConditions(Collections.singletonMap("timestamp", recentUpdates));
 
-        List<DdbRecordToWrite> queryRecords = mapper.query(DdbRecordToWrite.class, query);
+        List<DdbRecordToRead> queryRecords = mapper.query(DdbRecordToRead.class, query);
         
         //for debugging purpose only
-        DdbRecordToWrite lastElement = queryRecords.iterator().next();        
-        LOG.info(String.format("record include: %s \n", lastElement.getValues().toString()));
+        DdbRecordToRead lastElement = queryRecords.iterator().next();        
+        //LOG.info(String.format("record include: %s \n", lastElement.getValues().toString()));
         
         
-        // Return the counts as JSON
+        // Return the values as JSON
         resp.setContentType("application/json");
         resp.setStatus(HttpServletResponse.SC_OK);
         JSON.writeValue(resp.getWriter(), queryRecords);

@@ -63,7 +63,7 @@ public class DdbRecordToWrite {
         this.host = host;
     }
     
-    @DynamoDBAttribute(attributeName = "measurements")
+    @DynamoDBAttribute(attributeName = "values")
     @DynamoDBMarshalling(marshallerClass = MeasurementRecordMarshaller.class)
     public List<SingleMeasurementValue> getValues() {
         return measurementValues;
