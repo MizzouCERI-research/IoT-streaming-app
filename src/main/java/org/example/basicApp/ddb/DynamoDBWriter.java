@@ -1,9 +1,11 @@
 package org.example.basicApp.ddb;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -52,7 +54,7 @@ import com.amazonaws.services.kinesis.AmazonKinesisClient;
 public class DynamoDBWriter {
 	
     private static final Log LOG = LogFactory.getLog(DynamoDBWriter.class);
-
+	private static final float deviation = 0.1f;
     static AmazonDynamoDB dynamoDB;
         
     public static void main(String[] args) throws Exception {
@@ -82,26 +84,29 @@ public class DynamoDBWriter {
         TableDescription tableDescription = dynamoDB.describeTable(describeTableRequest).getTable();
         System.out.println("Table Description: " + tableDescription);
         
+        Date date = new Date();
         try {
         	
             while(true) {
 	            
 	            // Add an item
 	            VrMeasurement measurementRecord =  new VrMeasurement();
-	            System.out.printf("record generated is: %s \n" , measurementRecord.toString());
+	            System.out.printf("record ready to put into DynamoDB is: %s \n" , measurementRecord.toString());
 
 	            DdbRecordToWrite ddbRecordToWrite = new DdbRecordToWrite();
 	            ddbRecordToWrite.setResource(measurementRecord.getResource());
 	            ddbRecordToWrite.setTimeStamp(measurementRecord.getTimeStamp());
-	            ddbRecordToWrite.setHost(measurementRecord.getHost());
+	            
+	            //date.setTime(System.currentTimeMillis());
+	            //ddbRecordToWrite.setTimeStamp(date);
 	            
 	        	List<SingleMeasurementValue> measurementValues = new ArrayList<SingleMeasurementValue>();
-	           	SingleMeasurementValue value1 = new SingleMeasurementValue("{\"measurement\":\"engagement\",\"value\":", measurementRecord.getEngagement()+"}");
-	        	SingleMeasurementValue value2 = new SingleMeasurementValue("{\"measurement\":\"focus\",\"value\":", measurementRecord.getFocus()+"}");
-	        	SingleMeasurementValue value3 = new SingleMeasurementValue("{\"measurement\":\"excitement\",\"value\":", measurementRecord.getExcitement()+"}");
-	        	SingleMeasurementValue value4 = new SingleMeasurementValue("{\"measurement\":\"frustration\",\"value\":", measurementRecord.getFrustration()+"}");
-	        	SingleMeasurementValue value5 = new SingleMeasurementValue("{\"measurement\":\"stress\",\"value\":", measurementRecord.getStress()+"}");
-	        	SingleMeasurementValue value6 = new SingleMeasurementValue("{\"measurement\":\"relaxation\",\"value\":", measurementRecord.getRelaxation()+"}");
+	           	SingleMeasurementValue value1 = new SingleMeasurementValue("{\"measurement\":\"engagement\",\"value\":", getRandomFloat(0.9f),"}");
+	        	SingleMeasurementValue value2 = new SingleMeasurementValue("{\"measurement\":\"focus\",\"value\":", getRandomFloat(0.8f),"}");
+	        	SingleMeasurementValue value3 = new SingleMeasurementValue("{\"measurement\":\"excitement\",\"value\":", getRandomFloat(0.7f),"}");
+	        	SingleMeasurementValue value4 = new SingleMeasurementValue("{\"measurement\":\"frustration\",\"value\":", getRandomFloat(0.2f),"}");
+	        	SingleMeasurementValue value5 = new SingleMeasurementValue("{\"measurement\":\"stress\",\"value\":", getRandomFloat(0.1f),"}");
+	        	SingleMeasurementValue value6 = new SingleMeasurementValue("{\"measurement\":\"relaxation\",\"value\":", getRandomFloat(0.5f),"}");
 	        	measurementValues.add(value1);
 	    		measurementValues.add(value2);
 	    		measurementValues.add(value3);
@@ -155,5 +160,18 @@ public class DynamoDBWriter {
         return item;
     }
     
+    public static Float getRandomFloat(Float mean) {
+    	
+    	Random rand = new Random();	
+    	// set the price using the deviation and mean price
+        
+    	Float max = mean + deviation;
+    	Float min = mean - deviation;
+
+        // randomly pick a quantity of shares
+        Float value = rand.nextFloat() * (max - min) + min; 
+
+        return value;
+    }
 	
 }

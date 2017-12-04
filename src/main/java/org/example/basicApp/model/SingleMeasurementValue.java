@@ -3,13 +3,14 @@ package org.example.basicApp.model;
 public class SingleMeasurementValue {
 	
 	private String measurementName;
-	private String value;
-
+	private Float value;
+	private String postfix;
 	
-	public SingleMeasurementValue (String name, String value) {
+	public SingleMeasurementValue (String name, Float value, String postfix) {
 		
 		this.measurementName = name;
 		this.value = value;
+		this.postfix = postfix;
 		
 	}
 	
@@ -25,19 +26,31 @@ public class SingleMeasurementValue {
 	}
 	
 	
-	public String getValue() {
+	public Float getValue() {
 		
 		return value;
 	}
 	
-	public void setValue (String value) {
+	public void setValue (Float value) {
 		
 		this.value = value;
 	}
 	
+	public String getPostFix() {
+		
+		return postfix;
+	}
+	
+	public void setPostFix (String postifx) {
+		
+		this.postfix = postfix;
+	}
+	
+	
+	
    @Override
     public String toString() {
-        return String.format("%s %s \n",measurementName, value);
+        return String.format("%s %s %s \n",measurementName, value.toString(), postfix);
     }
 
 }
