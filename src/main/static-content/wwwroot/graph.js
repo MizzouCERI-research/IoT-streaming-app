@@ -499,7 +499,7 @@ var CountData = function() {
             data : {}
           };
           // Set the count
-          measureData.data[record.timestamp] = measurementValue.value;
+          measureData.data[record.timeStamp] = measurementValue.value;
           
           // Update the referrer data
           data[measurementValue.measurement] = measureData;
@@ -516,14 +516,14 @@ var CountData = function() {
      * @param {number}
      *          timestamp Any data older than this time will be removed.
      */
-    removeDataOlderThan : function(timestamp) {
+    removeDataOlderThan : function(timeStamp) {
       // For each referrer
         $.each(data, function(measurement, measurementData) {
         var shouldUpdateTotals = false;
         // For each data point
         $.each(measurementData.data, function(ts, value) {
           // If the data point is older than the provided time
-          if (ts < timestamp) {
+          if (ts < timeStamp) {
             // Remove the timestamp from the data        	  
             //delete measurementData.data[ts];
         	  
