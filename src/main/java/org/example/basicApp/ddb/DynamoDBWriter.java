@@ -96,7 +96,7 @@ public class DynamoDBWriter {
 	            DdbRecordToWrite ddbRecordToWrite = new DdbRecordToWrite();
 	            ddbRecordToWrite.setResource(measurementRecord.getResource());
 	            ddbRecordToWrite.setTimeStamp(measurementRecord.getTimeStamp());
-	            
+	            ddbRecordToWrite.setHost(measurementRecord.getHost());
 	            //date.setTime(System.currentTimeMillis());
 	            //ddbRecordToWrite.setTimeStamp(date);
 	            
