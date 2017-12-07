@@ -70,7 +70,7 @@ public class MeasurementProcessor {
         
         DynamoDBUtils dynamoDBUtils = new DynamoDBUtils(dynamoDB);
         dynamoDBUtils.createDynamoTableIfNotExists(dynamoTableName);
-        LOG.info(String.format("%s DynamoDB table is ready for use", dynamoTableName));
+        LOG.info(String.format("DynamoDB table %s is ready for use", dynamoTableName));
 
         String workerId = String.valueOf(UUID.randomUUID());
         LOG.info(String.format("Using working id: %s", workerId));
@@ -98,5 +98,14 @@ public class MeasurementProcessor {
             exitCode = 1;
         }
         System.exit(exitCode);
+//          while(true) {
+//        		try {
+//        			Thread.sleep(1000);
+//        		}
+//        		catch (InterruptedException e) {
+//        			LOG.error("Thread interrupted.....", e);
+//        			return;
+//        	    }
+//       	  }
     }
 }

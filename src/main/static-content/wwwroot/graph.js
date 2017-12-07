@@ -400,6 +400,7 @@ var CountData = function() {
       $.each(data[measurement].data, function(ts, value) {
         totals[measurement] = value;
       });
+
     } else {
       // No data for the referrer, remove the total if it exists
       // delete totals[measurement];

@@ -97,7 +97,7 @@ public class DdbRecordToWrite {
     
     @Override
     public String toString() {
-        return String.format("Measurement record ready to write into DB is: %s %s %s %s \n",
+        return String.format(" %s %s %s %s \n",
                resource, timestamp, host, 
                measurementValues.get(0).getMeasurementName(), measurementValues.get(0).getValue(),
                measurementValues.get(1).getMeasurementName(), measurementValues.get(1).getValue(),

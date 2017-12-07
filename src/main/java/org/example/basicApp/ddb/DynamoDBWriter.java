@@ -80,7 +80,7 @@ public class DynamoDBWriter {
          
         DynamoDBUtils dynamoDBUtils = new DynamoDBUtils(dynamoDB);
         dynamoDBUtils.createDynamoTableIfNotExists(dynamoTableName);
-        LOG.info(String.format("%s DynamoDB table is ready for use", dynamoTableName));
+        LOG.info(String.format("%s DynamoDB table is ready for use \n", dynamoTableName));
 	
         // Describe our new table
         DescribeTableRequest describeTableRequest = new DescribeTableRequest().withTableName(dynamoTableName);
@@ -93,7 +93,7 @@ public class DynamoDBWriter {
 	            
 	            // Add an item
 	            VrMeasurement measurementRecord =  new VrMeasurement();
-	            System.out.printf("record ready to put into DynamoDB is: %s \n" , measurementRecord.toString());
+	            //System.out.printf("record ready to put into DynamoDB is: %s \n" , measurementRecord.toString());
 
 	            DdbRecordToWrite ddbRecordToWrite = new DdbRecordToWrite();
 	            ddbRecordToWrite.setResource(measurementRecord.getResource());
@@ -109,7 +109,7 @@ public class DynamoDBWriter {
 	        	SingleMeasurementValue value2 = new SingleMeasurementValue("{\"measurement\":\"focus\",\"value\":", getRandomFloat(0.8f),"}");
 	        	SingleMeasurementValue value3 = new SingleMeasurementValue("{\"measurement\":\"excitement\",\"value\":", getRandomFloat(0.7f),"}");
 	        	SingleMeasurementValue value4 = new SingleMeasurementValue("{\"measurement\":\"frustration\",\"value\":", getRandomFloat(0.2f),"}");
-	        	SingleMeasurementValue value5 = new SingleMeasurementValue("{\"measurement\":\"stress\",\"value\":", getRandomFloat(0.1f),"}");
+	        	SingleMeasurementValue value5 = new SingleMeasurementValue("{\"measurement\":\"stress\",\"value\":", getRandomFloat(0.3f),"}");
 	        	SingleMeasurementValue value6 = new SingleMeasurementValue("{\"measurement\":\"relaxation\",\"value\":", getRandomFloat(0.5f),"}");
 	        	measurementValues.add(value1);
 	    		measurementValues.add(value2);
@@ -120,7 +120,7 @@ public class DynamoDBWriter {
 	    		
 	            ddbRecordToWrite.setValues(measurementValues);		            	            
 	            
-	            System.out.printf("record ready to write is: %s \n" , ddbRecordToWrite.toString());
+	            System.out.printf("record ready to persis into DynamoDB is: %s \n" , ddbRecordToWrite.toString());
 
 	            
 	            Map<String, AttributeValue> item = newItem(ddbRecordToWrite);
@@ -178,8 +178,8 @@ public class DynamoDBWriter {
     	Random rand = new Random();	
     	// set the price using the deviation and mean price
         
-    	Float max = mean + deviation;
-    	Float min = mean - deviation;
+    	Float max = mean + deviation/3;
+    	Float min = mean - deviation/3;
 
         // randomly pick a quantity of shares
         Float value = rand.nextFloat() * (max - min) + min; 

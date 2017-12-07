@@ -182,8 +182,8 @@ public class VrMeasurement {
         
     	// set the price using the deviation and mean price
         
-    	Float max = mean + deviation;
-    	Float min = mean - deviation;
+    	Float max = mean + deviation/3;
+    	Float min = mean - deviation/3;
 
         // randomly pick a quantity of shares
         Float value = rand.nextFloat() * (max - min) + min; 

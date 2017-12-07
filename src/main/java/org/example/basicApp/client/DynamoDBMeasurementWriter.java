@@ -149,15 +149,15 @@ public class DynamoDBMeasurementWriter {
             // Write the contents of the buffer as items to our table
             List<FailedBatch> failures = mapper.batchWrite(buffer, Collections.emptyList());
             long end = System.nanoTime();
-            LOG.info(String.format("%d new record sent to DynamoDB in %dms",
-                    buffer.size(),
-                    TimeUnit.NANOSECONDS.toMillis(end - start)));
+//            LOG.info(String.format("%d new record sent to DynamoDB in %dms",
+//                    buffer.size(),
+//                    TimeUnit.NANOSECONDS.toMillis(end - start)));
 
             for (FailedBatch failure : failures) {
-                LOG.warn("Error sending count batch to DynamoDB. This will not be retried!", failure.getException());
+                //LOG.warn("Error sending measurement batch to DynamoDB. This will not be retried!", failure.getException());
             }
         } catch (Exception ex) {
-            LOG.error("Error sending new counts to DynamoDB. The some counts may not be persisted.", ex);
+            //LOG.error("Error sending new measurements to DynamoDB. The some measurements may not be persisted.", ex);
         }
     }
   

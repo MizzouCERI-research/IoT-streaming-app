@@ -1,5 +1,7 @@
 package org.example.basicApp.model;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -68,26 +70,7 @@ public class DdbRecordToRead {
     public List<SingleMeasurementValue> getValues() {
         return measurementValues;
     }
-/*
-    public void setValues(VrMeasurement vrMeasurement) {
-    	
-    	SingleMeasurementValue value1 = new SingleMeasurementValue("engagement", vrMeasurement.getEngagement());
-    	System.out.println("value1 is " + value1.toString()+ "\n");
-    	SingleMeasurementValue value2 = new SingleMeasurementValue("focus", vrMeasurement.getFocus());
-    	SingleMeasurementValue value3 = new SingleMeasurementValue("excitement", vrMeasurement.getExcitement());
-    	SingleMeasurementValue value4 = new SingleMeasurementValue("frustration", vrMeasurement.getFrustration());
-    	SingleMeasurementValue value5 = new SingleMeasurementValue("stress", vrMeasurement.getStress());
-    	SingleMeasurementValue value6 = new SingleMeasurementValue("relaxation", vrMeasurement.getRelaxation());
-    	
-    	this.measurementValues.add(value1);
-		this.measurementValues.add(value2);
-		this.measurementValues.add(value3);
-		this.measurementValues.add(value4);
-		this.measurementValues.add(value5);
-		this.measurementValues.add(value6);
-        
-    }    
- */
+
     public void setValues(List<SingleMeasurementValue> measurementValues) {
 
     	this.measurementValues = measurementValues;
@@ -97,8 +80,11 @@ public class DdbRecordToRead {
     
     @Override
     public String toString() {
-        return String.format("Measurement record ready to write into DB is: %s %s %s %s \n",
-               resource, "what ever", host, 
+    	
+    	DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    	
+        return String.format(" %s %s %s %s \n",
+               resource, df.format(timestamp), host, 
                measurementValues.get(0).getMeasurementName(), measurementValues.get(0).getValue(),
                measurementValues.get(1).getMeasurementName(), measurementValues.get(1).getValue(),
                measurementValues.get(2).getMeasurementName(), measurementValues.get(2).getValue(),
