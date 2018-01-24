@@ -23,18 +23,7 @@ public class DdbRecordToWrite {
     private String timestamp;
     private String host;
 	private List<SingleMeasurementValue> measurementValues = new ArrayList<SingleMeasurementValue>();
-
-/*	
-	public DdbRecordToWrite (VrMeasurement vrMeasurement) {
-		
-       	this.resource = vrMeasurement.getResource();
-        this.timestamp = vrMeasurement.getTimeStamp();
-        this.host = vrMeasurement.getHost();    	
-        //setValues(vrMeasurement);
-
-		
-	}
-*/	
+	
 	@DynamoDBHashKey(attributeName = "resource")
 	public String getResource() {
 	    return resource;
@@ -42,8 +31,7 @@ public class DdbRecordToWrite {
 	
 	public void setResource(String resource) {
 	    this.resource = resource;
-	}
-	
+	}	
 	
 	@DynamoDBRangeKey(attributeName = "timestamp")
 	public String getTimeStamp() {
@@ -68,44 +56,23 @@ public class DdbRecordToWrite {
     public List<SingleMeasurementValue> getValues() {
         return measurementValues;
     }
-/*
-    public void setValues(VrMeasurement vrMeasurement) {
-    	
-    	SingleMeasurementValue value1 = new SingleMeasurementValue("engagement", vrMeasurement.getEngagement());
-    	System.out.println("value1 is " + value1.toString()+ "\n");
-    	SingleMeasurementValue value2 = new SingleMeasurementValue("focus", vrMeasurement.getFocus());
-    	SingleMeasurementValue value3 = new SingleMeasurementValue("excitement", vrMeasurement.getExcitement());
-    	SingleMeasurementValue value4 = new SingleMeasurementValue("frustration", vrMeasurement.getFrustration());
-    	SingleMeasurementValue value5 = new SingleMeasurementValue("stress", vrMeasurement.getStress());
-    	SingleMeasurementValue value6 = new SingleMeasurementValue("relaxation", vrMeasurement.getRelaxation());
-    	
-    	this.measurementValues.add(value1);
-		this.measurementValues.add(value2);
-		this.measurementValues.add(value3);
-		this.measurementValues.add(value4);
-		this.measurementValues.add(value5);
-		this.measurementValues.add(value6);
-        
-    }    
- */
+
     public void setValues(List<SingleMeasurementValue> measurementValues) {
 
-    	this.measurementValues = measurementValues;
-        
-    }    
+    	this.measurementValues = measurementValues;        
+    }        
     
-    
-    @Override
-    public String toString() {
-        return String.format(" %s %s %s %s \n",
-               resource, timestamp, host, 
-               measurementValues.get(0).getMeasurementName(), measurementValues.get(0).getValue(),
-               measurementValues.get(1).getMeasurementName(), measurementValues.get(1).getValue(),
-               measurementValues.get(2).getMeasurementName(), measurementValues.get(2).getValue(),
-               measurementValues.get(3).getMeasurementName(), measurementValues.get(3).getValue(),
-               measurementValues.get(4).getMeasurementName(), measurementValues.get(4).getValue(),
-               measurementValues.get(5).getMeasurementName(), measurementValues.get(5).getValue()
-        		);
-    }
+//    @Override
+//    public String toString() {
+//        return String.format(" %s %s %s %s %.3f %s %.3f %s %.3f %s %.3f %s %.3f %s %.3f\n",
+//               resource, timestamp, host, 
+//               measurementValues.get(0).getMeasurementName(), measurementValues.get(0).getValue(),
+//               measurementValues.get(1).getMeasurementName(), measurementValues.get(1).getValue(),
+//               measurementValues.get(2).getMeasurementName(), measurementValues.get(2).getValue(),
+//               measurementValues.get(3).getMeasurementName(), measurementValues.get(3).getValue(),
+//               measurementValues.get(4).getMeasurementName(), measurementValues.get(4).getValue(),
+//               measurementValues.get(5).getMeasurementName(), measurementValues.get(5).getValue()
+//        		);
+//    }
 
 }

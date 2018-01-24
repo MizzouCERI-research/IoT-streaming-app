@@ -1,18 +1,3 @@
-/*
- * Copyright 2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- * Licensed under the Amazon Software License (the "License").
- * You may not use this file except in compliance with the License.
- * A copy of the License is located at
- *
- * http://aws.amazon.com/asl/
- *
- * or in the "license" file accompanying this file. This file is distributed
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing
- * permissions and limitations under the License.
- */
-
 package org.example.basicApp.client;
 
 import java.io.IOException;
@@ -38,20 +23,15 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/**
- * Computes a map of (HttpReferrerPair -> count(pair)) over a fixed range of time. Counts are computed at the intervals
- * provided.
- *
- * @param <T> The type of records this processor is capable of counting.
- */
+// record processor to process records from stream
 public class MeasurementRecordProcessor implements IRecordProcessor {
 
 	private static final Log LOG = LogFactory.getLog(MeasurementRecordProcessor.class);
     
-    // Our JSON object mapper for deserializing records
+    // JSON object mapper for deserializing records
     private final ObjectMapper objectMapper;
 
-    // The shard this processor is processing
+    // The shard ID this processor is processing
     private String kinesisShardId;
     
     // This is responsible for writing record to dynamoDB every interval
@@ -66,15 +46,7 @@ public class MeasurementRecordProcessor implements IRecordProcessor {
     private long nextCheckpointTimeInMillis;
     
     
-    /**
-     * Create a new processor.
-     *
-     * @param config Configuration for this record processor.
-     * @param recordType The type of record we expect to receive as a UTF-8 JSON string.
-     * @param persister Counts will be persisted with this persister.
-     * @param computeRangeInMillis Range to compute distinct counts across
-     * @param computeIntervalInMillis Interval between computing total count for the overall time range.
-     */
+    // Create a new processor with the dbWriter to write data to dynamoDB    
     public MeasurementRecordProcessor(DynamoDBMeasurementWriter dbWriter) {
 
         if (dbWriter == null) {
@@ -82,7 +54,6 @@ public class MeasurementRecordProcessor implements IRecordProcessor {
         }
         
         this.dbWriter = dbWriter;
-
         // Create an object mapper to deserialize records that ignores unknown properties
         objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -93,32 +64,24 @@ public class MeasurementRecordProcessor implements IRecordProcessor {
         LOG.info("Initializing record processor for shard: " + shardId);
         this.kinesisShardId = shardId;
         dbWriter.initialize();
-
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void processRecords(List<Record> records, IRecordProcessorCheckpointer checkpointer) {
+    	
         LOG.info("Processing " + records.size() + " records from " + kinesisShardId);
         
         for (Record record : records) {
             boolean processedSuccessfully = false;
             for (int i = 0; i < NUM_RETRIES; i++) {
                 try {
-                    //
-                    // Logic to process record goes here.
-                    //
                     processSingleRecord(record);
-
                     processedSuccessfully = true;
                     break;
                 } catch (Throwable t) {
                     LOG.warn("Caught throwable while processing record " + record, t);
                 }
-
-                // backoff if we encounter an exception.
+                // backoff if encounter an exception.
                 try {
                     Thread.sleep(BACKOFF_TIME_IN_MILLIS);
                 } catch (InterruptedException e) {
@@ -138,27 +101,23 @@ public class MeasurementRecordProcessor implements IRecordProcessor {
         }
     }
 
-
+    // process a single record
     public void processSingleRecord(Record r) {
      
-        // Deserialize each record as an UTF-8 encoded JSON String of the type provided
+        // Deserialize each record as an encoded JSON String of the type provided
         VrMeasurement data = null;
         	
         try {
-           data = objectMapper.readValue(r.getData().array(), VrMeasurement.class);
-           //LOG.info(String.format("Measurement record read from stream is: %s \n", data.toString()));
-           LOG.info(String.format("one record has been processed......... %s", data.toString()));
-               
+           data = objectMapper.readValue(r.getData().array(), VrMeasurement.class);           
+           LOG.info(String.format("one record has been processed......... %s", data.toString()));               
         } catch (IOException e) {
            LOG.warn("Skipping record. Unable to parse record into Measurements. Partition Key: "
                 + r.getPartitionKey() + ". Sequence Number: " + r.getSequenceNumber(),e);           
-        }
-        
-        // Persist the counts if we have a full range
+        }        
+        // Persist the data record into queue
         if (data != null) {
             dbWriter.pushToQueue(data);
-        }
-        
+        }        
      }
 
     @Override
@@ -173,11 +132,8 @@ public class MeasurementRecordProcessor implements IRecordProcessor {
             }
         }
     }
-
     
-    /** Checkpoint with retries.
-     * @param checkpointer
-     */
+    // Checkpoint with retries.
     private void checkpoint(IRecordProcessorCheckpointer checkpointer) {
         LOG.info("Checkpointing shard " + kinesisShardId);
         for (int i = 0; i < NUM_RETRIES; i++) {
@@ -204,7 +160,6 @@ public class MeasurementRecordProcessor implements IRecordProcessor {
                 break;
             }catch (InterruptedException e) {
                 LOG.error("Error encountered while checkpointing dbWriter.", e);
-                // Fall through to attempt retry
             }
             try {
                 Thread.sleep(BACKOFF_TIME_IN_MILLIS);
@@ -212,6 +167,5 @@ public class MeasurementRecordProcessor implements IRecordProcessor {
                 LOG.debug("Interrupted sleep", e);
             }
         }
-    }
-    
+    }    
 }
