@@ -147,14 +147,13 @@ public class DynamoDBMeasurementWriter {
 		measurementValues.add(value3);
 		measurementValues.add(value4);
 		measurementValues.add(value5);
-		measurementValues.add(value6);
-		
+		measurementValues.add(value6);		
         ddbRecordToWrite.setValues(measurementValues);
         
+        System.out.printf("record ready to persis into DynamoDB is: \n");
         Map<String, AttributeValue> item = newItem(ddbRecordToWrite);
         for (Map.Entry entry : item.entrySet())
-        {
-        	System.out.printf("record ready to persis into DynamoDB is: \n");
+        {      	
             System.out.println("key: " + entry.getKey() + "; value: " + entry.getValue());
         }
 
@@ -182,6 +181,8 @@ public class DynamoDBMeasurementWriter {
         buffer.add(queue.take());
 
         queue.drainTo(buffer);
+        
+        // skip using mapper as it is not working for now
 //        try {
 //            long start = System.nanoTime();
 //            // Write the contents of the buffer as records to our table
@@ -199,7 +200,7 @@ public class DynamoDBMeasurementWriter {
 	        for (Map<String, AttributeValue> singleRecord : buffer) {
 	            PutItemRequest putItemRequest = new PutItemRequest(dynamoTable, singleRecord);
 	            PutItemResult putItemResult = dynamoDB.putItem(putItemRequest);
-	            System.out.println("Result: " + putItemResult);	 
+	            System.out.println("Result: one data record has been persisted into dynamoDB... \n"+ putItemResult);	 
 	        }
 	        
         }catch (AmazonServiceException ase) {

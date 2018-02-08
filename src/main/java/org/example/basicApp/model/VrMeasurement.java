@@ -1,4 +1,3 @@
-
 package org.example.basicApp.model;
 
 import java.io.IOException;
@@ -18,6 +17,7 @@ import java.util.TimeZone;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+// main data record class with 6 measurement metrics generated randomly
 public class VrMeasurement {
 
 	private static final float deviation = 0.1f;
@@ -42,18 +42,16 @@ public class VrMeasurement {
         
         Date date = new Date();
         date.setTime(System.currentTimeMillis());
-        //String formattedDate = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date);
         
         this.resource = "EEG sensor";
-        //this.timestamp = formattedDate;
         this.timestamp = toISO8601UTC(date);
         this.host = "wangso";    	
     	this.engagement = getRandomFloat(0.9f);
-        this.focus = getRandomFloat(0.9f);
+        this.focus = getRandomFloat(0.8f);
         this.excitement = getRandomFloat(0.7f);
-        this.frustration = getRandomFloat(0.2f);
-        this.stress = getRandomFloat(0.1f);
-        this.relaxation = getRandomFloat(0.7f);        
+        this.frustration = getRandomFloat(0.3f);
+        this.stress = getRandomFloat(0.2f);
+        this.relaxation = getRandomFloat(0.5f);        
     }
      
     public String getResource() {

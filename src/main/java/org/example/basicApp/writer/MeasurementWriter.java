@@ -66,12 +66,12 @@ public class MeasurementWriter {
         kinesisClient.setRegion(region);
         
         // Creates a stream to write to with 2 shards
-			StreamUtils streamUtils = new StreamUtils(kinesisClient);
-			streamUtils.createStreamIfNotExists(streamName, 2);
-			LOG.info(String.format("%s stream is ready for use", streamName));
+		StreamUtils streamUtils = new StreamUtils(kinesisClient);
+		streamUtils.createStreamIfNotExists(streamName, 2);
+		LOG.info(String.format("%s stream is ready for use", streamName));
 
         // Repeatedly send measurements with a 1000 milliseconds wait in between
-		final MeasurementPutter measurementPutter = new MeasurementPutter(/*vrMeasurement,*/ kinesisClient, streamName);
+		final MeasurementPutter measurementPutter = new MeasurementPutter(kinesisClient, streamName);
 
 		ExecutorService es = Executors.newCachedThreadPool();
         Runnable measurementSender = new Runnable() {

@@ -23,10 +23,8 @@ public class MeasurementPutter {
 
     private final ObjectMapper JSON = new ObjectMapper();
 
-    public MeasurementPutter(/*VrMeasurement vrMeasurement,*/ AmazonKinesis kinesis, String streamName) {
-        //if (vrMeasurement == null) {
-        //   throw new IllegalArgumentException("vrMeasurement must not be null");
-        //}
+    public MeasurementPutter(AmazonKinesis kinesis, String streamName) {
+
         if (kinesis == null) {
             throw new IllegalArgumentException("kinesis must not be null");
         }
