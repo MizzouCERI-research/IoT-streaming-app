@@ -39,7 +39,7 @@ public class MeasurementPutter {
     // Send a fixed number of data records to Amazon Kinesis. 
     public void sendMeasurements(long n, long delayBetweenRecords, TimeUnit unitForDelay) throws InterruptedException {
         for (int i = 0; i < n && !Thread.currentThread().isInterrupted(); i++) {
-            sendMeasurement();
+            sendMeasurement("wangso");
             Thread.sleep(unitForDelay.toMillis(delayBetweenRecords));
         }
     }
@@ -47,7 +47,8 @@ public class MeasurementPutter {
     // Continuously sends data records to Amazon Kinesis sequentially
     public void sendMeasurementsIndefinitely(long delayBetweenRecords, TimeUnit unitForDelay) throws InterruptedException {
         while (!Thread.currentThread().isInterrupted()) {
-            sendMeasurement();
+            sendMeasurement("user1");
+            sendMeasurement("user2");
             if (delayBetweenRecords > 0) {
                 Thread.sleep(unitForDelay.toMillis(delayBetweenRecords));
             }
@@ -55,9 +56,10 @@ public class MeasurementPutter {
     }
 
     // Send a single record to Amazon Kinesis using PutRecord.
-    private void sendMeasurement() {  
+    private void sendMeasurement(String user) {  
     	
-    	final VrMeasurement vrMeasurement = new VrMeasurement();    	
+    	final VrMeasurement vrMeasurement = new VrMeasurement();   
+    	vrMeasurement.setHost(user);
         byte[] bytes;
         try {
             bytes = JSON.writeValueAsBytes(vrMeasurement);
