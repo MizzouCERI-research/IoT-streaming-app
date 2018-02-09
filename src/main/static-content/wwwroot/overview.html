@@ -1,0 +1,169 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>EEG sensor Data Visualization</title>
+
+  <link rel="stylesheet" href="/graph.css" type="text/css"></link>
+
+  <!-- Include Flotchart.org scripts and dependencies -->
+  <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="flot-0.8.2/excanvas.min.js"></script><![endif]-->
+  <script src="flot-0.8.2/jquery.min.js"></script>
+  <script src="flot-0.8.2/jquery.flot.min.js"></script>
+  <script src="flot-0.8.2/jquery.flot.time.min.js"></script>
+
+  <!-- Include the Amazon Kinesis Data Visualization Sample Application graph script and stylesheet -->
+  <script src="graph.js"></script>
+  
+  <script>
+	window.onload = function () {
+	console.log("I am here1");
+
+	var chart = new CanvasJS.Chart("chartContainer", {
+		title: {
+			text: "Values of Each Emotion Measurement"
+		},
+		axisY: {
+			title: "Emotion level",
+			suffix: ""
+		},
+		data:[
+			{
+				type: "column",	
+				showInLegend: false,
+				name: "user1",
+				yValueFormatString: "0.##",
+				indexLabel: "{y}",
+				dataPoints: [
+					{ label: "Engagement", y: 0.80 },
+					{ label: "Focus", y: 0.70 },
+					{ label: "Excitement", y: 0.60 },
+					{ label: "Frustration", y: 0.20 },
+					{ label: "Stress", y: 0.40 },
+					{ label: "Relaxation", y: 0.50 }
+				]
+			},
+			{
+				type: "column",
+				showInLegend: false,
+				name: "user2",
+				yValueFormatString: "0.##",
+				indexLabel: "{y}",
+				dataPoints: [
+					{ label: "Engagement", y: 0.80 },
+					{ label: "Focus", y: 0.70 },
+					{ label: "Excitement", y: 0.60 },
+					{ label: "Frustration", y: 0.20 },
+					{ label: "Stress", y: 0.40 },
+					{ label: "Relaxation", y: 0.50 }
+				]
+			},
+			{
+				type: "column",
+				showInLegend: false,
+				name: "user3",
+				yValueFormatString: "0.##",
+				indexLabel: "{y}",
+				dataPoints: [
+					{ label: "Engagement", y: 0.80 },
+					{ label: "Focus", y: 0.70 },
+					{ label: "Excitement", y: 0.60 },
+					{ label: "Frustration", y: 0.20 },
+					{ label: "Stress", y: 0.40 },
+					{ label: "Relaxation", y: 0.50 }
+				]
+			},
+			{
+				type: "column",	
+				showInLegend: false,
+				name: "user4",
+				yValueFormatString: "0.##",
+				indexLabel: "{y}",
+				dataPoints: [
+					{ label: "Engagement", y: 0.80 },
+					{ label: "Focus", y: 0.70 },
+					{ label: "Excitement", y: 0.60 },
+					{ label: "Frustration", y: 0.20 },
+					{ label: "Stress", y: 0.40 },
+					{ label: "Relaxation", y: 0.50 }
+				]
+			},
+			{
+				type: "column",	
+				showInLegend: false,
+				name: "user5",
+				yValueFormatString: "0.##",
+				indexLabel: "{y}",
+				dataPoints: [
+					{ label: "Engagement", y: 0.80 },
+					{ label: "Focus", y: 0.70 },
+					{ label: "Excitement", y: 0.60 },
+					{ label: "Frustration", y: 0.20 },
+					{ label: "Stress", y: 0.40 },
+					{ label: "Relaxation", y: 0.50 }
+				]
+			},
+			{
+				type: "column",	
+				showInLegend: false,
+				name: "user6",
+				yValueFormatString: "0.##",
+				indexLabel: "{y}",
+				dataPoints: [
+					{ label: "Engagement", y: 0.80 },
+					{ label: "Focus", y: 0.70 },
+					{ label: "Excitement", y: 0.60 },
+					{ label: "Frustration", y: 0.20 },
+					{ label: "Stress", y: 0.40 },
+					{ label: "Relaxation", y: 0.50 }
+				]
+			}]
+	});
+	
+	function updateChart() {
+		var boilerColor, deltaY, yVal;
+		var dps = new Array(6);
+		var measurements = ["Engagement","Focus","Excitement","Frustration","Stress","Relaxation"];
+		var deviation = 0.1;
+		console.log("I am here2");
+		for (var i=0; i<6; i++){
+			dps[i] = chart.options.data[i].dataPoints;
+			for (var j = 0; j < dps[i].length; j++) {
+				
+				var max = dps[i][j].y + deviation/3.0;
+		    	var min = dps[i][j].y - deviation/3.0;
+		        yVal = Math.random() * (max - min) + min;
+		        if (yVal <0){
+		        	yVal=0.01;
+		        }
+				boilerColor = yVal > 0.8 ? "Red" : yVal >= 0.5 ? "Yellow" : yVal < 0.5 ? "Green" : null;
+				dps[i][j] = {label: measurements[j] , y: yVal, color: boilerColor};
+			}
+			chart.options.data[i].dataPoints = dps[i]; 
+		}
+		chart.render();
+	};
+	updateChart();
+
+	setInterval(function() {updateChart()}, 1000);
+	
+	}
+	</script>
+  
+</head>
+
+<body>
+  <div id="chartContainer" style="height: 800px; width: 1500px;"></div>
+  <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+  <div id="description"></div>
+  <div id="graph"></div>
+  <div id="updatedBy"></div>
+  <div id="measurementContainer">
+	  <div id="measurementDescription"></div>
+	  <div id="measurement"></div>
+  </div>
+</body>
+
+<html>
