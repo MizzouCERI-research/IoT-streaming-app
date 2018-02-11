@@ -49,6 +49,10 @@ public class MeasurementPutter {
         while (!Thread.currentThread().isInterrupted()) {
             sendMeasurement("user1");
             sendMeasurement("user2");
+            sendMeasurement("user3");
+            sendMeasurement("user4");
+            sendMeasurement("user5");
+            sendMeasurement("user6");
             if (delayBetweenRecords > 0) {
                 Thread.sleep(unitForDelay.toMillis(delayBetweenRecords));
             }
