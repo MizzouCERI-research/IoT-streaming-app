@@ -52,7 +52,7 @@ public class WebServer {
         }
         Server server = new Server(Integer.parseInt(args[0]));
         String wwwroot = args[1];
-        String countsTableName = args[2];
+        String measurementTableName = args[2];
         Region region = SampleUtils.parseRegion(args[3]);
 
         // Servlet context
@@ -63,7 +63,7 @@ public class WebServer {
         // Static resource context
         ResourceHandler resources = new ResourceHandler();
         resources.setDirectoriesListed(false);
-        resources.setWelcomeFiles(new String[] { "graph.html" });
+        resources.setWelcomeFiles(new String[] { "overview.html" });
         resources.setResourceBase(wwwroot);
 
         // Create the servlet to handle records
@@ -72,7 +72,7 @@ public class WebServer {
         AmazonDynamoDB dynamoDB = new AmazonDynamoDBClient(credentialsProvider, clientConfig);
         dynamoDB.setRegion(region);
         DynamoDBUtils dynamoDBUtils = new DynamoDBUtils(dynamoDB);
-        context.addServlet(new ServletHolder(new GetMeasurementServlet(dynamoDBUtils.createMapperForTable(countsTableName))),
+        context.addServlet(new ServletHolder(new GetMeasurementServlet(dynamoDBUtils.createMapperForTable(measurementTableName))),
                 "/GetMeasurements/*");
                 
         HandlerList handlers = new HandlerList();

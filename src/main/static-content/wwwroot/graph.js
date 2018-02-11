@@ -133,7 +133,7 @@ var UIHelper = function(data, graph) {
   // How often should the average be updated?
   var intervalsPerAverage = 5;
   // How far back should we fetch data at every interval?
-  var rangeOfDataToFetchEveryIntervalInSeconds = 5;
+  var rangeOfDataToFetchEveryIntervalInSeconds = 1;
   // how many measurements does average display?
   var numMeasurementToDisplay = 6;
   // Keep track of when we last updated the average.
