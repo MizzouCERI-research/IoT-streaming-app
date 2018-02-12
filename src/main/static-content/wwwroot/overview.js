@@ -60,6 +60,11 @@ window.onload= function(){
 	var updateData = function(resource, secondsAgo, callback) {
 	    // Fetch data from our data provider
 	    provider.getData(resource, secondsAgo, function(newData) {
+	    	
+	    	str = JSON.stringify(newData);
+	        console.log(str);
+	        alert(str);
+	        
 	      // Store the data locally
 	      data.addNewData(newData);
 //	      
@@ -114,18 +119,22 @@ window.onload= function(){
 //			}
 //			chart.options.data[i].dataPoints = dps[i]; 
 		}
-		chart.render();			
+		chart.render();
+		data = [];
 	}
 
 	updateUserNum(numUsers);
 	
-	var resource = "EEG sensor";
-	var secondsAgo = 1;
+
 	updateData(resource, secondsAgo);
 	
 	updateChart(chart);
 	
-	setInterval(function() {updateChart(chart)}, 1000);
+	setInterval(function() {
+		updateUserNum(numUsers);
+		updateData(resource, secondsAgo);
+		updateChart(chart);
+	}, 1000);
 
 }//window.onload closing parenthesis
 
@@ -170,7 +179,7 @@ var MeasurementDataProvider = function() {
 var MeasurementData = function() {
 
   var data = [];
-  var dataPerUser={name:{}, userData:[]};
+  
 
 //	var data={};
 	
@@ -191,8 +200,10 @@ var MeasurementData = function() {
 
     	newMeasurementData.forEach(function(record) {
     		
-    		var user= record.host;
-
+    		var dataPerUser={name:record.host, userData:[]};
+//    		var user= record.host;
+//    		dataPerUser.name = record.host;
+    		
 	        // Add individual measurement
 	        record.values.forEach(function(measurementValue) {
 	          // create a new data series entry for this measurement
@@ -203,7 +214,7 @@ var MeasurementData = function() {
 		          };
 	          
 	          // Update the measurement data
-	          dataPerUser.name = record.host;
+	          
 	          dataPerUser.userData.push(measureData);
 //	          data[j].push(measureData);
 	        });
@@ -233,6 +244,8 @@ var MeasurementData = function() {
   }
 }
 
+var resource = "EEG sensor";
+var secondsAgo = 1;
 //var uiHelper = new UIHelper(data, chart);
 var data = new MeasurementData();
 var provider = new MeasurementDataProvider();
