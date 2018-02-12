@@ -1,4 +1,4 @@
-var numUsers = 6;
+//var numUsers = 6;
 
 window.onload= function(){
 	var chart = new CanvasJS.Chart("chartContainer", {
@@ -10,7 +10,7 @@ window.onload= function(){
 			suffix: ""
 		},
 		data:[
-			{
+			{		
 				type: "column",	
 				showInLegend: true,
 				name: "user1",
@@ -105,8 +105,9 @@ window.onload= function(){
 					{ label: "Stress", y: 0.40 },
 					{ label: "Relaxation", y: 0.80 }
 				]
-			}]
-		});		
+			}
+		]
+	});		
 	
 	updateChart(chart);
 
@@ -117,33 +118,37 @@ window.onload= function(){
 
 var updateChart = function (chart) {
 	var barColor, yVal;
-	var dps = new Array(numUsers);
+	var dps = new Array(6);
+	var deviation =1.0;
 	var measurements = ["Engagement","Focus","Excitement","Frustration","Stress","Relaxation"];
 	var resource = "EEG sensor";
 	console.log("I am here2");
 	
-	provider.getData(resource, function(newData){
-		data.addNewData(newData);
-		if (callback) {
-			callback();
-		}
-	});	
+//	provider.getData(resource, function(newData){
+//		data.addNewData(newData);
+//		if (callback) {
+//			callback();
+//		}
+//	});	
 	
 	
 	for (var i=0; i< 6; i++){
 		dps[i] = chart.options.data[i].dataPoints;
-//		for (var j = 0; j < dps[i].length; j++) {
+		for (var j = 0; j < dps[i].length; j++) {
 			
-//			var max = dps[i][j].y + deviation/3.0;
-//	    	var min = dps[i][j].y - deviation/3.0;
-//	        yVal = Math.random() * (max - min) + min;
-//	        if (yVal <= 0.0){
-//	        	yVal=0.01;
-//	        }
-//	        if (yVal >= 1.0){
-//	        	yVal=0.99;
-//	        } 
-			//barColor = yVal > 0.8 ? "Red" : yVal >= 0.5 ? "Yellow" : yVal < 0.5 ? "Green" : null;
+			var max = dps[i][j].y + deviation/3.0;
+	    	var min = dps[i][j].y - deviation/3.0;
+	        yVal = Math.random() * (max - min) + min;
+		
+		
+		
+	        if (yVal <= 0.0){
+	        	yVal=0.01;
+	        }
+	        if (yVal >= 1.0){
+	        	yVal=0.99;
+	        } 
+			barColor = yVal > 0.8 ? "Red" : yVal >= 0.5 ? "Yellow" : yVal < 0.5 ? "Green" : null;
 	        if (j==0 || j==1 || j==2 || j==5){
 	        	barColor = yVal <0.7? "Red": chart.options.data[i].color;
 	        }
@@ -229,78 +234,78 @@ var updateChart = function (chart) {
 //  }
 //}
 //
-/**
- * Provides easy access to records data.
- */
-var MeasurementDataProvider = function() {
-  var _endpoint = "http://" + location.host + "/api/GetMeasurements";
-
-  /**
-   * Builds URL to fetch the number of records for a given resource in the past
-   */
-  buildUrl = function(resource) {
-    return _endpoint + "?resource=" + resource + "&range_in_seconds="
-        + 1;
-  };
-
-  return {
-    /**
-     * Set the endpoint to request records with.
-     */
-    setEndpoint : function(endpoint) {
-      _endpoint = endpoint;
-    },
-
-    /**
-     * Requests new data and passed it to the callback provided. 
-     */
-    getData : function(resource,callback) {
-      $.ajax({
-        url : buildUrl(resource, 1)
-      }).done(callback);
-    }
-  }
-}
-
-/**
- * Internal representation of data. 
- */
-var MeasurementData = function() {
-
-  var data = {};
-
-  return {
-    /**
-     * @returns {object} The internal representation of record data.
-     */
-    getData : function() {
-      return data;
-    },
-
-    /**
-     * Merges new data in to our existing data set.
-     *
-     * @param {object} Record data returned by our data provider.
-     */
-    addNewData : function(newMeasurementData) {
-
-    	newMeasurementData.forEach(function(record) {
-
-	        // Add individual measurement
-	        record.values.forEach(function(measurementValue) {
-	          // create a new data series entry for this measurement
-	          measureData = 
-		          {
-		            label : measurementValue.measurement,
-		                y : measurementValue.value
-		          };
-	          
-	          // Update the measurement data
-	          data[record.host][measurementValue.measurement] = measureData;
-
-        });
-      });
-    },
+///**
+// * Provides easy access to records data.
+// */
+//var MeasurementDataProvider = function() {
+//  var _endpoint = "http://" + location.host + "/api/GetMeasurements";
+//
+//  /**
+//   * Builds URL to fetch the number of records for a given resource in the past
+//   */
+//  buildUrl = function(resource) {
+//    return _endpoint + "?resource=" + resource + "&range_in_seconds="
+//        + 1;
+//  };
+//
+//  return {
+//    /**
+//     * Set the endpoint to request records with.
+//     */
+//    setEndpoint : function(endpoint) {
+//      _endpoint = endpoint;
+//    },
+//
+//    /**
+//     * Requests new data and passed it to the callback provided. 
+//     */
+//    getData : function(resource,callback) {
+//      $.ajax({
+//        url : buildUrl(resource, 1)
+//      }).done(callback);
+//    }
+//  }
+//}
+//
+///**
+// * Internal representation of data. 
+// */
+//var MeasurementData = function() {
+//
+//  var data = {};
+//
+//  return {
+//    /**
+//     * @returns {object} The internal representation of record data.
+//     */
+//    getData : function() {
+//      return data;
+//    },
+//
+//    /**
+//     * Merges new data in to our existing data set.
+//     *
+//     * @param {object} Record data returned by our data provider.
+//     */
+//    addNewData : function(newMeasurementData) {
+//
+//    	newMeasurementData.forEach(function(record) {
+//
+//	        // Add individual measurement
+//	        record.values.forEach(function(measurementValue) {
+//	          // create a new data series entry for this measurement
+//	          measureData = 
+//		          {
+//		            label : measurementValue.measurement,
+//		                y : measurementValue.value
+//		          };
+//	          
+//	          // Update the measurement data
+//	          data[record.host][measurementValue.measurement] = measureData;
+//
+//        });
+//      });
+//    },
 
     
     // convert data to overview data required data format
@@ -330,11 +335,11 @@ var MeasurementData = function() {
     
     
     
-  }
-}
+//  }
+//}
 
 
 //var chart = new Chart();
 //var uiHelper = new UIHelper(data, chart);
-var data = new MeasurementData();
-var provider = new MeasurementDataProvider();
+//var data = new MeasurementData();
+//var provider = new MeasurementDataProvider();
