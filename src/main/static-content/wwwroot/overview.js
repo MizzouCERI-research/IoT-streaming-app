@@ -74,45 +74,45 @@ window.onload= function(){
 	}
 	
 	var updateChart = function (chart) {
-		var barColor, yVal;
-		var dps = new Array(6);
-		var deviation =0.1;
-		var measurements = ["Engagement","Focus","Excitement","Frustration","Stress","Relaxation"];
-		var resource = "EEG sensor";
+//		var barColor, yVal;
+		var dps = new Array(6);		
+		var measurements = ["Engagement","Focus","Excitement","Frustration","Stress","Relaxation"];		
 		console.log("I am here2");
-	
-	//	provider.getData(resource, function(newData){
-	//		data.addNewData(newData);
-	//		if (callback) {
-	//			callback();
-	//		}
-	//	});	
-	
-	
+
 		for (var i=0; i< numUsers; i++){
-			dps[i] = chart.options.data[i].dataPoints;
-			for (var j = 0; j < dps[i].length; j++) {
+//			dps[i] = chart.options.data[i].dataPoints;
+			var name = chart.options.data[i].name;
 			
-				var max = dps[i][j].y + deviation/3.0;
-		    	var min = dps[i][j].y - deviation/3.0;
-		        yVal = Math.random() * (max - min) + min;			
-			
-		        if (yVal <= 0.0){
-		        	yVal=0.01;
-		        }
-		        if (yVal >= 1.0){
-		        	yVal=0.99;
-		        } 
-				barColor = yVal > 0.8 ? "Red" : yVal >= 0.5 ? "Yellow" : yVal < 0.5 ? "Green" : null;
-		        if (j==0 || j==1 || j==2 || j==5){
-		        	barColor = yVal <0.7? "Red": chart.options.data[i].color;
-		        }
-		        else {
-		        	barColor = yVal > 0.5 ? "Red": chart.options.data[i].color;
-		        }
-				dps[i][j] = {label: measurements[j] , y: yVal, color: barColor};
+			for (var j=0; j< numUsers; j++){
+				if (data[j].name == name) {
+					chart.options.data[i].dataPoints = data[j].userData;
+				}				
 			}
-			chart.options.data[i].dataPoints = dps[i]; 
+			
+//			for (var j = 0; j < 6; j++) {
+//								
+//				chart.options.data[i].dataPoints[j] = data[name][j];
+//				
+//				
+//				
+//				
+////		        if (yVal <= 0.0){
+////		        	yVal=0.01;
+////		        }
+////		        if (yVal >= 1.0){
+////		        	yVal=0.99;
+////		        }				
+////				barColor = yVal > 0.8 ? "Red" : yVal >= 0.5 ? "Yellow" : yVal < 0.5 ? "Green" : null;
+//				
+//		        if (j==0 || j==1 || j==2 || j==5){
+//		        	barColor = yVal <0.7? "Red": chart.options.data[i].color;
+//		        }
+//		        else {
+//		        	barColor = yVal > 0.5 ? "Red": chart.options.data[i].color;
+//		        }
+//				dps[i][j] = {label: measurements[j] , y: yVal, color: barColor};
+//			}
+//			chart.options.data[i].dataPoints = dps[i]; 
 		}
 		chart.render();			
 	}
@@ -126,10 +126,6 @@ window.onload= function(){
 	updateChart(chart);
 	
 	setInterval(function() {updateChart(chart)}, 1000);
-
-
-
-
 
 }//window.onload closing parenthesis
 
@@ -173,8 +169,11 @@ var MeasurementDataProvider = function() {
  */
 var MeasurementData = function() {
 
-  var data = {};
+  var data = [];
+  var dataPerUser={name:{}, userData:[]};
 
+//	var data={};
+	
   return {
     /**
      * @returns {object} The internal representation of record data.
@@ -191,6 +190,8 @@ var MeasurementData = function() {
     addNewData : function(newMeasurementData) {
 
     	newMeasurementData.forEach(function(record) {
+    		
+    		var user= record.host;
 
 	        // Add individual measurement
 	        record.values.forEach(function(measurementValue) {
@@ -202,10 +203,15 @@ var MeasurementData = function() {
 		          };
 	          
 	          // Update the measurement data
-	          data[record.host][measurementValue.measurement] = measureData;
-
-        });
+	          dataPerUser.name = record.host;
+	          dataPerUser.userData.push(measureData);
+//	          data[j].push(measureData);
+	        });
+	        data.push(dataPerUser);	        
       });
+    	str = JSON.stringify(data);
+        console.log(str);
+        alert(str);    	
     }
 
     
