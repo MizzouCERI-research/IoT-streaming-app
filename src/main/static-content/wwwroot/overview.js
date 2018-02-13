@@ -13,17 +13,22 @@ window.onload= function(){
 		data:[]
 	});		
 	
-	data=[{"name":"user1","userData":[{"label":"engagement","y":0.88},{"label":"focus","y":0.816},{"label":"excitement","y":0.713},{"label":"frustration","y":0.293},{"label":"stress","y":0.175},{"label":"relaxation","y":0.512}]},
-		{"name":"user2","userData":[{"label":"engagement","y":0.883},{"label":"focus","y":0.776},{"label":"excitement","y":0.669},{"label":"frustration","y":0.32},{"label":"stress","y":0.2},{"label":"relaxation","y":0.478}]},
-			{"name":"user3","userData":[{"label":"engagement","y":0.883},{"label":"focus","y":0.776},{"label":"excitement","y":0.669},{"label":"frustration","y":0.32},{"label":"stress","y":0.2},{"label":"relaxation","y":0.478}]}];
- 
+
 	updateNumBars(numUsers, chart);
 
-	//data = updateData(resource, secondsAgo);
+	updateData(resource, secondsAgo);
 	
 	updateChart(chart, data);
 	
-	setInterval(function() {updateChart(chart, data)}, 1000);
+	setInterval(function() {
+		
+		updateNumBars(numUsers, chart);
+
+		updateData(resource, secondsAgo);
+		
+		updateChart(chart, data);
+		
+	}, 1000);
 
 }//window.onload closing parenthesis
 
@@ -80,12 +85,12 @@ var updateData = function(resource, secondsAgo) {
     provider.getData(resource, secondsAgo, function(newData) {
       // Store the data locally
     	dataAll.addNewData(newData);
-    	localData = dataAll.getData();
-      	str = JSON.stringify(localData);
+    	data = dataAll.getData();
+      	str = JSON.stringify(data);
         console.log(str);
         alert(str); 
     });
-    return localData;
+//    return localData;
 }
 
 var updateChart = function (paramChart , paramData) {
@@ -104,7 +109,7 @@ var updateChart = function (paramChart , paramData) {
 			}				
 		}
 	}
-	paramChart.render();			
+	paramChart.render();	
 }
 
 
@@ -149,8 +154,6 @@ var MeasurementData = function() {
   var data = [];
   var dataPerUser={name:{}, userData:[]};
 
-//	var data={};
-	
   return {
     /**
      * @returns {object} The internal representation of record data.
@@ -195,9 +198,11 @@ var MeasurementData = function() {
 }
 
 //var uiHelper = new UIHelper(data, chart);
-var numUsers = 3;
+var numUsers = 2;
 var resource = "EEG sensor";
 var secondsAgo = 1;
-var data;
+var data=[{"name":"user1","userData":[{"label":"engagement","y":0.88},{"label":"focus","y":0.816},{"label":"excitement","y":0.713},{"label":"frustration","y":0.293},{"label":"stress","y":0.175},{"label":"relaxation","y":0.512}]},
+	      {"name":"user3","userData":[{"label":"engagement","y":0.883},{"label":"focus","y":0.776},{"label":"excitement","y":0.669},{"label":"frustration","y":0.32},{"label":"stress","y":0.2},{"label":"relaxation","y":0.478}]}];
+
 var dataAll = new MeasurementData();
 var provider = new MeasurementDataProvider();
