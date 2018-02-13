@@ -1,7 +1,6 @@
-var numUsers = 2;
 
-window.onload= function(){
-	
+window.onload = function () {
+
 	var chart = new CanvasJS.Chart("chartContainer", {
 		title: {
 			text: "Overview of Emotion Measurements"
@@ -10,11 +9,83 @@ window.onload= function(){
 			title: "Emotion level",
 			suffix: ""
 		},
-		data:[]
-	});		
+		data:[
+			{
+			type: "column",	
+			showInLegend: true,
+			name: "user1",
+			color: "Blue",
+			yValueFormatString: "0.##",
+			indexLabel: "{y}",
+			dataPoints: [
+				{ label: "Engagement", y: 0.80 },
+				{ label: "Focus", y: 0.80 },
+				{ label: "Excitement", y: 0.80 },
+				{ label: "Frustration", y: 0.40 },
+				{ label: "Stress", y: 0.40 },
+				{ label: "Relaxation", y: 0.80 }
+			]					
+		}]
+	});
+	console.log("I am here 1");
+
+	function updateChart () {
+	//		var barColor, yVal;
+			var dps = new Array(6);		
+			var measurements = ["Engagement","Focus","Excitement","Frustration","Stress","Relaxation"];		
+			console.log("I am here 2");
 	
-	var updateUserNum = function (numUser){
-		for (var i=0; i<numUser; i++) {
+	//    	str = JSON.stringify(data);
+	//        console.log(str);
+	//        alert(str);
+			
+			for (var i=0; i< numUsers; i++){
+	//			dps[i] = chart.options.data[i].dataPoints;
+				var name = chart.options.data[i].name;
+				
+				for (var j=0; j< numUsers; j++){
+					if (data[j].name == name) {
+						chart.options.data[i].dataPoints = data[j].userData;
+					}				
+				}
+				
+	//			for (var j = 0; j < 6; j++) {
+	//								
+	//				chart.options.data[i].dataPoints[j] = data[name][j];
+	//				
+	//				
+	//				
+	//				
+	////		        if (yVal <= 0.0){
+	////		        	yVal=0.01;
+	////		        }
+	////		        if (yVal >= 1.0){
+	////		        	yVal=0.99;
+	////		        }				
+	////				barColor = yVal > 0.8 ? "Red" : yVal >= 0.5 ? "Yellow" : yVal < 0.5 ? "Green" : null;
+	//				
+	//		        if (j==0 || j==1 || j==2 || j==5){
+	//		        	barColor = yVal <0.7? "Red": chart.options.data[i].color;
+	//		        }
+	//		        else {
+	//		        	barColor = yVal > 0.5 ? "Red": chart.options.data[i].color;
+	//		        }
+	//				dps[i][j] = {label: measurements[j] , y: yVal, color: barColor};
+	//			}
+	//			chart.options.data[i].dataPoints = dps[i]; 
+			}
+			chart.render();
+			data = [];
+
+	};		
+
+	updateChart();
+	
+var UIHelper = function(data, chart) {
+
+	var	updateUserNum = function (){
+					
+		for (var i=0; i<numUsers; i++) {
 			if(i % 2 ==0){
 				chart.options.data.push(
 					{
@@ -54,19 +125,24 @@ window.onload= function(){
 					}			
 				);
 			}	
-		};		
-	};
+		};
+		
+	}
 	
 	var updateData = function(resource, secondsAgo, callback) {
 	    // Fetch data from our data provider
 	    provider.getData(resource, secondsAgo, function(newData) {
 	    	
-	    	str = JSON.stringify(newData);
-	        console.log(str);
-	        alert(str);
+//	    	str = JSON.stringify(newData);
+//	        console.log(str);
+//	        alert(str);
 	        
 	      // Store the data locally
 	      data.addNewData(newData);
+	    	str = JSON.stringify(data);
+	        console.log(str);
+	        alert(str);
+	        
 //	      
 //	      // Remove data that's outside the window of data we are displaying. This
 //	      // is unnecessary to keep around.
@@ -78,67 +154,21 @@ window.onload= function(){
 	    });
 	}
 	
-	var updateChart = function (chart) {
-//		var barColor, yVal;
-		var dps = new Array(6);		
-		var measurements = ["Engagement","Focus","Excitement","Frustration","Stress","Relaxation"];		
-		console.log("I am here2");
-
-		for (var i=0; i< numUsers; i++){
-//			dps[i] = chart.options.data[i].dataPoints;
-			var name = chart.options.data[i].name;
-			
-			for (var j=0; j< numUsers; j++){
-				if (data[j].name == name) {
-					chart.options.data[i].dataPoints = data[j].userData;
-				}				
-			}
-			
-//			for (var j = 0; j < 6; j++) {
-//								
-//				chart.options.data[i].dataPoints[j] = data[name][j];
-//				
-//				
-//				
-//				
-////		        if (yVal <= 0.0){
-////		        	yVal=0.01;
-////		        }
-////		        if (yVal >= 1.0){
-////		        	yVal=0.99;
-////		        }				
-////				barColor = yVal > 0.8 ? "Red" : yVal >= 0.5 ? "Yellow" : yVal < 0.5 ? "Green" : null;
-//				
-//		        if (j==0 || j==1 || j==2 || j==5){
-//		        	barColor = yVal <0.7? "Red": chart.options.data[i].color;
-//		        }
-//		        else {
-//		        	barColor = yVal > 0.5 ? "Red": chart.options.data[i].color;
-//		        }
-//				dps[i][j] = {label: measurements[j] , y: yVal, color: barColor};
-//			}
-//			chart.options.data[i].dataPoints = dps[i]; 
-		}
-		chart.render();
-		data = [];
-	}
-
-	updateUserNum(numUsers);
-	
-
-	updateData(resource, secondsAgo);
-	
-	updateChart(chart);
-	
-	setInterval(function() {
-		updateUserNum(numUsers);
+	var	updateChart = function(){
 		updateData(resource, secondsAgo);
-		updateChart(chart);
-	}, 1000);
-
-}//window.onload closing parenthesis
-
-
+		chart.update(data);
+	}
+	
+	return {
+		
+		start: function() {
+			updateUserNum();
+			updateData(resource, secondsAgo, function(){
+				updateChart();				
+			});
+		}
+	}
+};
 
 /**
  * Provides access to records data.
@@ -178,8 +208,7 @@ var MeasurementDataProvider = function() {
  */
 var MeasurementData = function() {
 
-  var data = [];
-  
+  var data = [];  
 
 //	var data={};
 	
@@ -220,9 +249,9 @@ var MeasurementData = function() {
 	        });
 	        data.push(dataPerUser);	        
       });
-    	str = JSON.stringify(data);
-        console.log(str);
-        alert(str);    	
+//    	str = JSON.stringify(data);
+//        console.log(str);
+//        alert(str);    	
     }
 
     
@@ -244,8 +273,20 @@ var MeasurementData = function() {
   }
 }
 
+
+
+setInterval(function() {
+	
+}, 1000);
+
+
+var numUsers = 2;
 var resource = "EEG sensor";
 var secondsAgo = 1;
-//var uiHelper = new UIHelper(data, chart);
 var data = new MeasurementData();
 var provider = new MeasurementDataProvider();
+
+
+
+
+}//window.onload closing parenthesis
