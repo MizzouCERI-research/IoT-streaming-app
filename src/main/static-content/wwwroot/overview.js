@@ -22,7 +22,7 @@ window.onload= function(){
 	
 	setInterval(function() {
 		
-		updateNumBars(numUsers, chart);
+//		updateNumBars(numUsers, chart);
 
 		updateData(resource, secondsAgo);
 		
@@ -35,7 +35,7 @@ window.onload= function(){
 
 
 var updateNumBars = function (num, paramChart){
-	for (var i=1; i<=num; i++) {
+	for (var i=1; i<num+1; i++) {
 		if(i % 2 ==0){
 			paramChart.options.data.push(
 				{
@@ -85,6 +85,8 @@ var updateData = function(resource, secondsAgo) {
     provider.getData(resource, secondsAgo, function(newData) {
       // Store the data locally
     	dataAll.addNewData(newData);
+    	dataAll.removeDataOlderThan((new Date()).getTime() - 1000));
+    	
     	data = dataAll.getData();
       	str = JSON.stringify(data);
         console.log(str);
@@ -193,7 +195,22 @@ var MeasurementData = function() {
 //    	str = JSON.stringify(data);
 //        console.log(str);
 //        alert(str);    	
-    }
+    },
+    
+    removeDataOlderThan : function(timeStamp) {
+        // For each measurement
+          $.each(data, function(measurement, measurementData) {
+        	  
+	          // For each data point
+	          $.each(measurementData.data, function(ts, value) {
+	            // If the data point is older than the provided time
+	            if (ts < timeStamp) {
+	              // Remove the timestamp from the data        	  
+	              delete measurementData.data[ts];
+	            }
+	          });
+        });
+      }   
   }
 }
 
@@ -202,7 +219,7 @@ var numUsers = 2;
 var resource = "EEG sensor";
 var secondsAgo = 1;
 var data=[{"name":"user1","userData":[{"label":"engagement","y":0.88},{"label":"focus","y":0.816},{"label":"excitement","y":0.713},{"label":"frustration","y":0.293},{"label":"stress","y":0.175},{"label":"relaxation","y":0.512}]},
-	      {"name":"user3","userData":[{"label":"engagement","y":0.883},{"label":"focus","y":0.776},{"label":"excitement","y":0.669},{"label":"frustration","y":0.32},{"label":"stress","y":0.2},{"label":"relaxation","y":0.478}]}];
-
+	      {"name":"user2","userData":[{"label":"engagement","y":0.883},{"label":"focus","y":0.776},{"label":"excitement","y":0.669},{"label":"frustration","y":0.32},{"label":"stress","y":0.2},{"label":"relaxation","y":0.478}]}];
+//var data=[];
 var dataAll = new MeasurementData();
 var provider = new MeasurementDataProvider();
