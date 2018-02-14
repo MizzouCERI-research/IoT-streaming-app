@@ -101,8 +101,8 @@ public class GetMeasurementServlet extends HttpServlet {
         List<DdbRecordToRead> queryRecords = mapper.query(DdbRecordToRead.class, query);
         
         //for debugging purpose only
-        DdbRecordToRead lastElement = queryRecords.iterator().next();        
-        LOG.info(String.format("record read from DynamoDB is: %s \n", lastElement.getValues().toString()));
+//        DdbRecordToRead lastElement = queryRecords.iterator().next();        
+//        LOG.info(String.format("record read from DynamoDB is: %s \n", lastElement.getValues().toString()));
         
         
         // Return the values as JSON
