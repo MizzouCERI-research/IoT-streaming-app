@@ -176,12 +176,10 @@ window.onload= function(){
 			console.log("I am here 5.1");
 			
 	    	str = JSON.stringify(newMeasurementData);
-	        console.log(str);	
-			
-			
-	    	dataPerUser={name:{}, resource:{}, timeStamp:{}, userData:[]};
+	        console.log(str);				
+	    	
 	    	newMeasurementData.forEach(function(record) {
-	  		
+	    		dataPerUser={name:{}, resource:{}, timeStamp:{}, userData:[]};
 	        	dataPerUser.timeStamp = record.timeStamp;
 	        	dataPerUser.resource = record.resource;
 	        	dataPerUser.name = record.host;
@@ -200,6 +198,7 @@ window.onload= function(){
 		            dataPerUser.userData.push(measureData);
 	//	            data[j].push(measureData);
 		        });
+		        
 		        data.push(dataPerUser);	
 		        
 	      });    	
