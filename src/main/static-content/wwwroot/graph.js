@@ -91,6 +91,11 @@ var Graph = function() {
     update : function(flotData) {
       graph.setData(flotData);
       
+      str = JSON.stringify(flotData);
+      //console.log(str);
+      alert(str);
+      // Tested, new count data format is good! 
+      
       // Calculate min and max value to update y-axis range.
       var getValue = function(tuple) {
         // Flot data values are stored as the second element of each data array
@@ -130,26 +135,26 @@ var Graph = function() {
 var UIHelper = function(data, graph) {
   // How frequently should we poll for new data and update the graph?
   var updateIntervalInMillis = 1000;
-  // How often should the average be updated?
-  var intervalsPerAverage = 5;
+  // How often should the top N display be updated?
+  var intervalsPerTopNUpdate = 5;
   // How far back should we fetch data at every interval?
-  var rangeOfDataToFetchEveryIntervalInSeconds = 1;
-  // how many measurements does average display?
-  var numMeasurementToDisplay = 6;
-  // Keep track of when we last updated the average.
-  var averageIntervalCounter = 1;
+  var rangeOfDataToFetchEveryIntervalInSeconds = 5;
+  // What should N be for our Top N display?
+  var topNToCalculate = 6;
+  // Keep track of when we last updated the top N display.
+  var topNIntervalCounter = 1;
   // Controls the update loop.
   var running = true;
-  // Set the active resource to query for when updating data.
+  // Set the active resource to query for counts when updating data.
   var activeResource = "EEG sensor";
 
   /**
-   * Fetch records from the last secondsAgo seconds.
+   * Fetch counts from the last secondsAgo seconds.
    *
    * @param {string}
-   *          resource The resource to fetch records for.
+   *          resource The resource to fetch counts for.
    * @param {number}
-   *          secondsAgo The range in seconds since now to fetch records for.
+   *          secondsAgo The range in seconds since now to fetch counts for.
    * @param {function}
    *          callback The callback to invoke when data has been updated.
    */
@@ -158,7 +163,9 @@ var UIHelper = function(data, graph) {
     provider.getData(resource, secondsAgo, function(newData) {
       // Store the data locally
       data.addNewData(newData);
-      
+      //str = JSON.stringify(newData);
+      //console.log(str);
+      //alert(str);
       // Remove data that's outside the window of data we are displaying. This
       // is unnecessary to keep around.
       data.removeDataOlderThan((new Date()).getTime()
@@ -170,13 +177,13 @@ var UIHelper = function(data, graph) {
   }
 
   /**
-   * Update the average display.
+   * Update the top N display.
    */
-  var updateAverage = function() {
-    var average = data.getAverage(numMeasurementToDisplay);
+  var updateTopN = function() {
+    var topN = data.getTopN(topNToCalculate);
 
-    var table = $("<table/>").addClass("measurement");
-    $.each(average, function(_, v) {
+    var table = $("<table/>").addClass("topN");
+    $.each(topN, function(_, v) {
       console.loog
       var row = $("<tr/>");
       row.append($("<td/>").addClass('measurementColumn').text(v.measurement));
@@ -184,7 +191,7 @@ var UIHelper = function(data, graph) {
       table.append(row);
     });
 
-    $("#measurement").html(table);
+    $("#topN").html(table);
   }
 
   /**
@@ -194,12 +201,13 @@ var UIHelper = function(data, graph) {
     // Update our local data for the active resource
     updateData(activeResource, rangeOfDataToFetchEveryIntervalInSeconds);
 
-    // Update average every intervalsPerAverage intervals
-    if (averageIntervalCounter++ % intervalsPerAverage == 0) {
-      updateAverage(data);
-      averageIntervalCounter = 1;
+    // Update top N every intervalsPerTopNUpdate intervals
+    if (topNIntervalCounter++ % intervalsPerTopNUpdate == 0) {
+      updateTopN(data);
+      topNIntervalCounter = 1;
     }
-       
+   
+    
     // Update the graph with our new data, transformed into the data series
     // format Flot expects
     graph.update(data.toFlotData());
@@ -228,7 +236,7 @@ var UIHelper = function(data, graph) {
    * Set the last updated label, if one is provided.
    *
    * @param {string}
-   *          s The new host that last updated record data. If one is not
+   *          s The new host that last updated our count data. If one is not
    *          provided the last updated label will not be shown.
    */
   var setLastUpdatedBy = function(s) {
@@ -238,11 +246,11 @@ var UIHelper = function(data, graph) {
 
   return {
     /**
-     * Set the active resource the graph is displaying records for. This is for
+     * Set the active resource the graph is displaying counts for. This is for
      * debugging purposes.
      *
      * @param {string}
-     *          resource The resource to query our data provider for records of.
+     *          resource The resource to query our data provider for counts of.
      */
     setActiveResource : function(resource) {
       activeResource = resource;
@@ -258,8 +266,8 @@ var UIHelper = function(data, graph) {
           + graph.getTotalDurationToGraphInSeconds()
           + " seconds of EEG sensor measurement records.");
       
-      $("#measurementDescription").text("Average values of all " + numMeasurementToDisplay + " measurements in the recent "
-              + (intervalsPerAverage * updateIntervalInMillis) + " ms: ");
+      $("#topNDescription").text("Average values of all " + topNToCalculate + " measurements in the recent "
+              + (intervalsPerTopNUpdate * updateIntervalInMillis) + " ms: ");
       
     },
 
@@ -290,13 +298,22 @@ var UIHelper = function(data, graph) {
 };
 
 /**
- * Provides easy access to records data.
+ * Provides easy access to count data.
  */
-var MeasurementDataProvider = function() {
+var CountDataProvider = function() {
   var _endpoint = "http://" + location.host + "/api/GetMeasurements";
 
   /**
-   * Builds URL to fetch the number of records for a given resource in the past
+   * Builds a URL to fetch the number of counts for a given resource in the past
+   * range_in_seconds seconds.
+   *
+   * @param {string}
+   *          resource The resource to request counts for.
+   * @param {number}
+   *          range_in_seconds The range in seconds, since now, to request
+   *          counts for.
+   *
+   * @returns The URL to send a request for new data to.
    */
   buildUrl = function(resource, range_in_seconds) {
     return _endpoint + "?resource=" + resource + "&range_in_seconds="
@@ -305,14 +322,37 @@ var MeasurementDataProvider = function() {
 
   return {
     /**
-     * Set the endpoint to request records with.
+     * Set the endpoint to request counts with.
      */
     setEndpoint : function(endpoint) {
       _endpoint = endpoint;
     },
 
     /**
-     * Requests new data and passed it to the callback provided. 
+     * Requests new data and passed it to the callback provided. The data is
+     * expected to be returned in the following format. Note: Referrer counts
+     * are ordered in descending order so the natural Top N can be derived per
+     * interval simply by using the first N elements of the referrerCounts
+     * array.
+     *
+     * [{
+     *   "resource" : "/index.html",
+     *   "timestamp" : 1397156430562,
+     *   "host" : "worker01-ec2",
+     *   "referrerCounts" : [
+     *     {"referrer":"http://www.amazon.com","count":1002},
+     *     {"referrer":"http://aws.amazon.com","count":901}
+     *   ]
+     * }]
+     *
+     * @param {string}
+     *          resource The resource to request counts for.
+     * @param {number}
+     *          range_in_seconds The range in seconds, since now, to request
+     *          counts for.
+     * @param {function}
+     *          callback The function to call when data has been returned from
+     *          the endpoint.
      */
     getData : function(resource, range_in_seconds, callback) {
       $.ajax({
@@ -323,35 +363,51 @@ var MeasurementDataProvider = function() {
 }
 
 /**
- * Internal representation of data. 
+ * Internal representation of count data. The data is stored in an associative
+ * array by timestamp so it's easy to update a range of data without having to
+ * manually deduplicate entries. The internal representation is then transformed
+ * to what Flot expects with toFlotData().
  */
-var MeasurementData = function() {
-
+var CountData = function() {
+  // Data format:
+  // {
+  //   "http://www.amazon.com" : {
+  //     "label" : "http://www.amazon.com",
+  //     "lastUpdatedBy" : "worker01-ec2"
+  //     "data" : {
+  //       "1396559634129" : 150
+  //     }
+  //   }
+  // }
   var data = {};
 
+  // Totals format:
+  // {
+  //   "http://www.amazon.com" : 102333
+  // }
   var totals = {};
-  var counts = {};
-  var averages = {};
-  
-  // Host last updated the records.
+
+  // What host last updated the counts? This is useful to visualize how failover
+  // happens when a worker is replaced.
   var lastUpdatedBy;
 
   /**
-   * Update the average for each measurement.
+   * Update the total count for a given referrer.
+   *
+   * @param {string}
+   *          referrer Referrer to update the total for.
    */
-  var updateAverage = function(measurement) {
-    // Simply loop through all the records and sum them
+  var updateTotal = function(measurement) {
+    // Simply loop through all the counts and sum them if there is data for this
+    // referrer
     if (data[measurement]) {
       totals[measurement] = 0;
-      counts[measurement] = 0;
-      averages[measurement] = 0;
       $.each(data[measurement].data, function(ts, value) {
-        totals[measurement] += value; 
-        counts[measurement] ++;
+        totals[measurement] = value;
       });
-      averages[measurement] = totals[measurement]/counts[measurement];
-
     } else {
+      // No data for the referrer, remove the total if it exists
+      // delete totals[measurement];
     }
   }
 
@@ -359,7 +415,7 @@ var MeasurementData = function() {
    * Set the host that last updated data.
    *
    * @param {string}
-   *          host The host that last provided update records.
+   *          host The host that last provided update counts.
    */
   var setLastUpdatedBy = function(host) {
     lastUpdatedBy = host;
@@ -367,107 +423,136 @@ var MeasurementData = function() {
 
   return {
     /**
-     * @returns {object} The internal representation of record data.
+     * @returns {object} The internal representation of referrer data.
      */
     getData : function() {
       return data;
     },
 
     /**
-     * @returns {string} The host that last updated our record data.
+     * @returns {string} The host that last updated our count data.
      */
     getLastUpdatedBy : function() {
       return lastUpdatedBy;
     },
 
     /**
-     * @returns {object} An associative array of measurements to averages.
+     * @returns {object} An associative array of referrers to their total
+     *          counts.
      */
-    averagesAsArray : function() {
-      return averages;
+    getTotals : function() {
+      return totals;
     },
 
     /**
-     * Compute average using the data we have.
+     * Compute local top N using the entire range of data we currently have.
      *
      * @param {number}
-     *          n The number of measurement to calculate.
+     *          n The number of top referrers to calculate.
      *
-     * @returns {object[]} The measurement averages in descending order.
+     * @returns {object[]} The top referrers by count in descending order.
      */
-    getAverage : function(n) {
-      // Create an array out of the averages
-      var averagesAsArray = $.map(averages, function(value, measurement) {
+    getTopN : function(n) {
+      // Create an array out of the totals so we can sort it
+      var totalsAsArray = $.map(totals, function(value, measurement) {
         return {
           'measurement' : measurement,
           'value' : value
         };
       });
-      return averagesAsArray;
+      // Sort descending by count
+      var sorted = totalsAsArray.sort(function(a, b) {
+        return b.count - a.count;
+      });
+      // Return the first N
+      return sorted.slice(0, Math.min(n, sorted.length));
     },
 
     /**
-     * Merges new data in to our existing data set.
+     * Merges new count data in to our existing data set.
      *
-     * @param {object} Record data returned by our data provider.
+     * @param {object} Count data returned by our data provider.
      */
-    addNewData : function(newMeasurementData) {
-
-    	newMeasurementData.forEach(function(record) {
-        // Update the host who last updated the record
+    addNewData : function(newCountData) {
+      // Expected data format:
+      // [{
+      //   "resource" : "EEG sensor",
+      //   "timestamp" : 1397156430562,
+      //   "host" : "worker01-ec2",
+      //   "values" : [{"measurement":"engagement","value":0.8895654}]
+      // }]
+    	
+       //str = JSON.stringify(newCountData);
+       //console.log(str);
+       //alert(str);
+       // Tested, new count data format is good! 
+    	
+    	
+      newCountData.forEach(function(record) {
+        // Update the host who last calculated the counts
         setLastUpdatedBy(record.host);
-        // Add individual measurement
+        // Add individual referrer counts
         record.values.forEach(function(measurementValue) {
-          // Reuse or create a new data series entry for this measurement
+          // Reuse or create a new data series entry for this referrer
           measureData = data[measurementValue.measurement] || {
             label : measurementValue.measurement,
             data : {}
           };
-          // Set the measurement value
-          measureData.data[record.timeStamp] = measurementValue.value;
+          // Set the count
+          measureData.data[record.timestamp] = measurementValue.value;
           
-          // Update the measurement data
+          // Update the referrer data
           data[measurementValue.measurement] = measureData;
-          // Update our averages whenever new data is added
-          updateAverage(measurementValue.measurement);
+          // Update our totals whenever new data is added
+          updateTotal(measurementValue.measurement);
         });
       });
     },
 
     /**
-     * Removes data older than a specific time.
+     * Removes data older than a specific time. This will also prune referrers
+     * that have no data points.
      *
      * @param {number}
      *          timestamp Any data older than this time will be removed.
      */
-    removeDataOlderThan : function(timeStamp) {
-      // For each measurement
+    removeDataOlderThan : function(timestamp) {
+      // For each referrer
         $.each(data, function(measurement, measurementData) {
-        var shouldUpdateAverages = false;
+        var shouldUpdateTotals = false;
         // For each data point
         $.each(measurementData.data, function(ts, value) {
           // If the data point is older than the provided time
-          if (ts < timeStamp) {
+          if (ts < timestamp) {
             // Remove the timestamp from the data        	  
             //delete measurementData.data[ts];
         	  
-            // We need to update the averages for this measurement since we
+            // Indicate we need to update the totals for the referrer since we
             // removed data
-            shouldUpdateAverages = true;            
+            shouldUpdateTotals = true;
+            // If the referrer has no more data remove the referrer entirely
+            if (Object.keys(measurementData.data).length == 0) {
+              // Remove the empty referrer - it has no more data
+              //delete data[measurement];
+            }
           }
         });
-        if (shouldUpdateAverages) {
-          // Update the averages if we removed any data
-          updateAverage(measurement);
+        if (shouldUpdateTotals) {
+          // Update the totals if we removed any data
+          updateTotal(measurement);
         }
       });
     },
 
     /**
      * Convert our internal data to a Flot data object.
-     */    
+     *
+     * @returns {object[]} Array of data series for every referrer we know of.
+     */
+    
     toFlotData : function() {
       flotData = [];
+      //$.each(data, function(measurement, measurementData) {
       $.each(data, function(measurement, measureData) {
         flotData.push({
           label : measurement,
@@ -484,7 +569,7 @@ var MeasurementData = function() {
   }
 }
 
-var data = new MeasurementData();
-var provider = new MeasurementDataProvider();
+var data = new CountData();
+var provider = new CountDataProvider();
 var graph = new Graph();
 var uiHelper = new UIHelper(data, graph);

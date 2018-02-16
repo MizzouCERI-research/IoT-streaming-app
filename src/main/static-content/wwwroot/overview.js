@@ -1,6 +1,6 @@
 window.onload= function(){
 
-	var numUsers = 2;
+	var numUsers = 6;
 	var resource = "EEG sensor";
 	var secondsAgo = 1;
 //	var data=[{"name":"user1","userData":[{"label":"engagement","y":0.88},{"label":"focus","y":0.816},{"label":"excitement","y":0.713},{"label":"frustration","y":0.293},{"label":"stress","y":0.175},{"label":"relaxation","y":0.512}]},
@@ -33,12 +33,12 @@ window.onload= function(){
 						yValueFormatString: "0.##",
 						indexLabel: "{y}",
 						dataPoints: [
-							{ label: "Engagement", y: {} },
-							{ label: "Focus", y: {} },
-							{ label: "Excitement", y: {} },
-							{ label: "Frustration", y: {} },
-							{ label: "Stress", y: {} },
-							{ label: "Relaxation", y: {} }
+							{ label: "engagement", y: {} },
+							{ label: "focus", y: {} },
+							{ label: "excitement", y: {} },
+							{ label: "frustration", y: {} },
+							{ label: "stress", y: {} },
+							{ label: "relaxation", y: {} }
 						]					
 					}			
 				);
@@ -52,19 +52,19 @@ window.onload= function(){
 						yValueFormatString: "0.##",
 						indexLabel: "{y}",
 						dataPoints: [
-							{ label: "Engagement", y: {} },
-							{ label: "Focus", y: {} },
-							{ label: "Excitement", y: {} },
-							{ label: "Frustration", y: {} },
-							{ label: "Stress", y: {} },
-							{ label: "Relaxation", y: {} }
+							{ label: "engagement", y: {} },
+							{ label: "focus", y: {} },
+							{ label: "excitement", y: {} },
+							{ label: "frustration", y: {} },
+							{ label: "stress", y: {} },
+							{ label: "relaxation", y: {} }
 						]					
 					}			
 				);
 			}	
 		};
 
-		chart.render();
+		//chart.render();
 	};
 	
 	var updateData = function(resource, secondsAgo, callback) {

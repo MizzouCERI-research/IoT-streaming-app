@@ -1,3 +1,4 @@
+
 package org.example.basicApp.client;
 
 import java.net.UnknownHostException;
@@ -24,15 +25,25 @@ import org.example.basicApp.utils.DynamoDBUtils;
 import org.example.basicApp.utils.SampleUtils;
 import org.example.basicApp.utils.StreamUtils;
 
-// Amazon Kinesis client application to digest stream data
+/**
+ * Amazon Kinesis application .
+ */
 public class MeasurementProcessor {
-	
     private static final Log LOG = LogFactory.getLog(MeasurementProcessor.class);
    
     public static final String SAMPLE_APPLICATION_STREAM_NAME = "wangso-stream";
+
     private static final String SAMPLE_APPLICATION_NAME = "clientApp";
+
     
-    // Start the Kinesis Client application.
+    /**
+     * Start the Kinesis Client application.
+     * 
+     * @param args Expecting 4 arguments: Application name to use for the Kinesis Client Application, Stream name to
+     *        read from, DynamoDB table name to write measurement values into, and the AWS region in which these resources
+     *        exist or should be created.
+     */
+    
     public static void main(String[] args) throws UnknownHostException {
         if (args.length != 4) {
             System.err.println("Usage: " + MeasurementProcessor.class.getSimpleName()
@@ -45,7 +56,6 @@ public class MeasurementProcessor {
         String dynamoTableName = args[2];
         Region region = SampleUtils.parseRegion(args[3]);
 
-        //setup AWS credentials and user
         AWSCredentialsProvider credentialsProvider = new DefaultAWSCredentialsProviderChain();
         ClientConfiguration clientConfig = SampleUtils.configureUserAgentForSample(new ClientConfiguration());
         AmazonKinesis kinesis = new AmazonKinesisClient(credentialsProvider, clientConfig);
@@ -53,21 +63,18 @@ public class MeasurementProcessor {
         AmazonDynamoDB dynamoDB = new AmazonDynamoDBClient(credentialsProvider, clientConfig);
         dynamoDB.setRegion(region);
          
-        // Creates a stream to read from, if it does not exist
+        // Creates a stream to write to, if it doesn't exist
         StreamUtils streamUtils = new StreamUtils(kinesis);
         streamUtils.createStreamIfNotExists(streamName, 2);
         LOG.info(String.format("%s stream is ready for use", streamName));
         
-        // Create a dynamoDB table if it does not exist
         DynamoDBUtils dynamoDBUtils = new DynamoDBUtils(dynamoDB);
         dynamoDBUtils.createDynamoTableIfNotExists(dynamoTableName);
-        LOG.info(String.format("DynamoDB table %s is ready for use", dynamoTableName));
+        LOG.info(String.format("%s DynamoDB table is ready for use", dynamoTableName));
 
-        // create a client worker ID
         String workerId = String.valueOf(UUID.randomUUID());
         LOG.info(String.format("Using working id: %s", workerId));
         
-        // setup client configuration
         KinesisClientLibConfiguration kclConfig =
                 new KinesisClientLibConfiguration(applicationName, streamName, credentialsProvider, workerId);
         kclConfig.withCommonClientConfig(clientConfig);
@@ -76,16 +83,13 @@ public class MeasurementProcessor {
         
         // create a DB writer
         DynamoDBMeasurementWriter dbWriter =
-                new DynamoDBMeasurementWriter(dynamoDB,dynamoTableName);         
+                new DynamoDBMeasurementWriter(dynamoDBUtils.createMapperForTable(dynamoTableName));         
         
-        // create a new processor factory to generate processors
         IRecordProcessorFactory recordProcessorFactory =
                 new MeasurementRecordProcessorFactory(dbWriter);
 
-        // create a worker based on customized configuration
         Worker worker = new Worker(recordProcessorFactory, kclConfig);
 
-        // let the worker start to work
         int exitCode = 0;
         try {
             worker.run();

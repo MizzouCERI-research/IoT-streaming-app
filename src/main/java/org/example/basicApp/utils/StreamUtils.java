@@ -1,3 +1,18 @@
+/*
+ * Copyright 2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Amazon Software License (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ * http://aws.amazon.com/asl/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
 package org.example.basicApp.utils;
 
 import java.math.BigInteger;
@@ -16,7 +31,9 @@ import com.amazonaws.services.kinesis.model.ResourceNotFoundException;
 import com.amazonaws.services.kinesis.model.Shard;
 import com.amazonaws.services.kinesis.model.StreamDescription;
 
-// A collection of functions to manipulate Amazon Kinesis streams.
+/**
+ * A collection of functions to manipulate Amazon Kinesis streams.
+ */
 public class StreamUtils {
     private static final Log LOG = LogFactory.getLog(StreamUtils.class);
 
@@ -24,6 +41,11 @@ public class StreamUtils {
     private static final long CREATION_WAIT_TIME_IN_SECONDS = TimeUnit.SECONDS.toMillis(30);
     private static final long DELAY_BETWEEN_STATUS_CHECKS_IN_SECONDS = TimeUnit.SECONDS.toMillis(30);
 
+    /**
+     * Creates a new utility instance.
+     *
+     * @param kinesis The Amazon Kinesis client to use for all operations.
+     */
     public StreamUtils(AmazonKinesis kinesis) {
         if (kinesis == null) {
             throw new NullPointerException("Amazon Kinesis client must not be null");
@@ -31,7 +53,13 @@ public class StreamUtils {
         this.kinesis = kinesis;
     }
 
-    // Create a stream if it doesn't already exist. 
+    /**
+     * Create a stream if it doesn't already exist.
+     *
+     * @param streamName Name of stream
+     * @param shards Number of shards to create stream with. This is ignored if the stream already exists.
+     * @throws AmazonServiceException Error communicating with Amazon Kinesis.
+     */
     public void createStreamIfNotExists(String streamName, int shards) throws AmazonClientException {
         try {
             if (isActive(kinesis.describeStream(streamName))) {
@@ -74,12 +102,20 @@ public class StreamUtils {
         throw new RuntimeException("Stream " + streamName + " did not become active within 2 minutes.");
     }
 
-    // check to see if stream is active
+    /**
+     * Does the result of a describe stream request indicate the stream is ACTIVE?
+     *
+     * @param r The describe stream result to check for ACTIVE status.
+     */
     private boolean isActive(DescribeStreamResult r) {
         return "ACTIVE".equals(r.getStreamDescription().getStreamStatus());
     }
 
-    // Delete an Amazon Kinesis stream.
+    /**
+     * Delete an Amazon Kinesis stream.
+     *
+     * @param streamName The name of the stream to delete.
+     */
     public void deleteStream(String streamName) {
         LOG.info(String.format("Deleting Kinesis stream %s", streamName));
         try {
@@ -91,7 +127,19 @@ public class StreamUtils {
         }
     }
 
-    // Split a shard by dividing the hash key space in half.
+    /**
+     * Split a shard by dividing the hash key space in half.
+     *
+     * @param streamName Name of the stream that contains the shard to split.
+     * @param shardId The id of the shard to split.
+     *
+     * @throws IllegalArgumentException When either streamName or shardId are null or empty.
+     * @throws LimitExceededException Shard limit for the account has been reached.
+     * @throws ResourceNotFoundException The stream or shard cannot be found.
+     * @throws InvalidArgumentException If the shard is closed and no eligible for splitting.
+     * @throws AmazonClientException Error communicating with Amazon Kinesis.
+     *
+     */
     public void splitShardEvenly(String streamName, String shardId)
         throws LimitExceededException, ResourceNotFoundException, AmazonClientException, InvalidArgumentException,
         IllegalArgumentException {

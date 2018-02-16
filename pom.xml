@@ -133,8 +133,29 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-         
+        </profile>        
+        
+        <profile>
+            <!-- Start the DynamoDBWriter Application to store measurement data records -->
+            <id>dbWriter</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.2.1</version>
+                        <configuration>
+                            <mainClass>org.example.basicApp.ddb.DynamoDBWriter</mainClass>
+                            <arguments>
+                                <argument>${sample-application.measurement-table}</argument>
+                                <argument>${sample-application.region}</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile> 
+        
         <profile>
             <!-- Start a webserver to host the visualization web application -->
             <id>webserver</id>

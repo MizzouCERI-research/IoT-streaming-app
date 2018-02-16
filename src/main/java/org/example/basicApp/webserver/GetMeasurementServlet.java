@@ -8,9 +8,6 @@ import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
 import com.amazonaws.services.dynamodbv2.model.Condition;
 
 import org.example.basicApp.model.DdbRecordToRead;
-import org.example.basicApp.model.DdbRecordToWrite;
-import org.example.basicApp.model.SingleMeasurementValue;
-import org.example.basicApp.model.VrMeasurement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.eclipse.jetty.util.MultiMap;
@@ -28,7 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * A servlet to serve requests for measurement values.
+ * A servlet to serve requests for measurement values. This is a simple test and as such, its not really serializable.
  */
 @SuppressWarnings("serial")
 public class GetMeasurementServlet extends HttpServlet {
@@ -85,7 +82,7 @@ public class GetMeasurementServlet extends HttpServlet {
         c.add(Calendar.SECOND, -1 * rangeInSeconds);
         Date startTime = c.getTime();
         if (LOG.isDebugEnabled()) {
-            LOG.debug(String.format("Querying for measurements %s since %s", resource, DATE_FORMATTER.get().format(startTime)));
+            LOG.debug(String.format("Querying for counts of resource %s since %s", resource, DATE_FORMATTER.get().format(startTime)));
         }
 
         DynamoDBQueryExpression<DdbRecordToRead> query = new DynamoDBQueryExpression<>();
@@ -102,7 +99,7 @@ public class GetMeasurementServlet extends HttpServlet {
         
         //for debugging purpose only
 //        DdbRecordToRead lastElement = queryRecords.iterator().next();        
-//        LOG.info(String.format("record read from DynamoDB is: %s \n", lastElement.getValues().toString()));
+        //LOG.info(String.format("record include: %s \n", lastElement.getValues().toString()));
         
         
         // Return the values as JSON
