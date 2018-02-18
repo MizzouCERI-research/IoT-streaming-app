@@ -3,9 +3,9 @@
 $(function() {
 	getUser("user");
 	alert("user passed to this page is: "+ userTosplay);
-//  graph.inject();
-//  uiHelper.decorate();
-//  uiHelper.start();
+  graph.inject();
+  uiHelper.decorate();
+  uiHelper.start();
 });
 
 //function getParameterByName(name, url) {
@@ -353,7 +353,6 @@ var MeasurementDataProvider = function() {
 var MeasurementData = function() {
 
   var data = {};
-
   var totals = {};
   var counts = {};
   var averages = {};
@@ -439,23 +438,28 @@ var MeasurementData = function() {
     addNewData : function(newMeasurementData) {
 
     	newMeasurementData.forEach(function(record) {
-        // Update the host who last updated the record
-        setLastUpdatedBy(record.host);
-        // Add individual measurement
-        record.values.forEach(function(measurementValue) {
-          // Reuse or create a new data series entry for this measurement
-          measureData = data[measurementValue.measurement] || {
-            label : measurementValue.measurement,
-            data : {}
-          };
-          // Set the measurement value
-          measureData.data[record.timeStamp] = measurementValue.value;
-          
-          // Update the measurement data
-          data[measurementValue.measurement] = measureData;
-          // Update our averages whenever new data is added
-          updateAverage(measurementValue.measurement);
-        });
+    		if(record.host==userTosplay){
+	        // Update the host who last updated the record
+	        setLastUpdatedBy(record.host);
+	        // Add individual measurement
+	        record.values.forEach(function(measurementValue) {
+	          // Reuse or create a new data series entry for this measurement
+	          measureData = data[measurementValue.measurement] || {
+	            label : measurementValue.measurement,
+	            data : {}
+	          };
+	          // Set the measurement value
+	          measureData.data[record.timeStamp] = measurementValue.value;
+	          
+	          // Update the measurement data
+	          data[measurementValue.measurement] = measureData;
+	          // Update our averages whenever new data is added
+	          updateAverage(measurementValue.measurement);
+	        });
+    	  }
+    		else {
+//    			continue;
+    		}
       });
     },
 
