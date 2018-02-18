@@ -94,9 +94,9 @@ window.onload= function(){
 	};
 	
 	var updateChart = function (paramChart , paramData) {
-	//	var barColor, yVal;
-		var dps = new Array(6);		
-		var measurements = ["Engagement","Focus","Excitement","Frustration","Stress","Relaxation"];		
+		var barColor, name;
+		var dps = new Array(numUsers);		
+		var measurements = ["engagement","focus","excitement","frustration","stress","relaxation"];		
 		console.log("I am here 3");
 	
 //		str = JSON.stringify(paramData);
@@ -104,34 +104,46 @@ window.onload= function(){
 		
 		for (var i=0; i< numUsers; i++){
 			
-			dps[i] = chart.options.data[i].dataPoints;
+			dps[i] = paramChart.options.data[i].dataPoints;
 			
-			var name = paramChart.options.data[i].name;
+			name = paramChart.options.data[i].name;
 			
 	        for (var j=0; j< numUsers; j++){
 	        	
 				if (paramData[j].name == name) {
-					paramChart.options.data[i].dataPoints = paramData[j].userData;
+					dps[i] = paramData[j].userData;
 				}
 	        }	
 			
 	        for (var k= 0; k< dps[i].length; k++){	        	
 	        	
-				if paramChart.options.data[i].dataPoints[k].y <= 0.0 {
-					paramChart.options.data[i].dataPoints[k].y = 0.01;
+				if (dps[i][k].y <= 0.0) {
+					dps[i][k].y = 0.01;
 				}
-				if paramChart.options.data[i].dataPoints[k].y >= 1.0 {
-					paramChart.options.data[i].dataPoints[k].y = 0.99;
+				if (dps[i][k].y >= 1.0) {
+					dps[i][k].y = 0.99;
 				}
 				
-				barColor = yVal > 0.8 ? "Red" : yVal >= 0.5 ? "Yellow" : yVal < 0.5 ? "Green" : null;
-		        if (j==0 || j==1 || j==2 || j==5){
-		        	barColor = yVal <0.7? "Red": chart.options.data[i].color;
+//				barColor = yVal > 0.8 ? "Red" : yVal >= 0.5 ? "Yellow" : yVal < 0.5 ? "Green" : null;
+		        if (dps[i][k].label=="engagement"){
+		        	barColor = dps[i][k].y <0.85? "Red": paramChart.options.data[i].color;
+		        }
+		        else if (dps[i][k].label=="focus"){
+		        	barColor = dps[i][k].y <0.75? "Red": paramChart.options.data[i].color;
+		        }
+		        else if (dps[i][k].label=="excitement"){
+		        	barColor = dps[i][k].y <0.65? "Red": paramChart.options.data[i].color;
+		        }
+		        else if (dps[i][k].label=="frustration"){
+		        	barColor = dps[i][k].y >0.25? "Red": paramChart.options.data[i].color;
+		        }
+		        else if (dps[i][k].label=="stress"){
+		        	barColor = dps[i][k].y >0.15? "Red": paramChart.options.data[i].color;
 		        }
 		        else {
-		        	barColor = yVal > 0.5 ? "Red": chart.options.data[i].color;
+		        	barColor = dps[i][k].y < 0.45 ? "Red": paramChart.options.data[i].color;
 		        }
-				dps[i][j] = {label: measurements[j] , y: yVal, color: barColor};
+				dps[i][k] = {label: dps[i][k].label , y: dps[i][k].y, color: barColor};
 			}
 	        chart.options.data[i].dataPoints = dps[i];
 		}
