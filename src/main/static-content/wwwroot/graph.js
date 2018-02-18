@@ -2,22 +2,11 @@
 // When the page loads create our graph and start updating it.
 $(function() {
 	getUser("user");
-	alert("user passed to this page is: "+ userTosplay);
+//	alert("user passed to this page is: "+ userTosplay);
   graph.inject();
   uiHelper.decorate();
   uiHelper.start();
 });
-
-//function getParameterByName(name, url) {
-//if (!url) url = window.location.href;
-//name = name.replace(/[\[\]]/g, "\\$&");
-//var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-//  results = regex.exec(url);
-//if (!results) return null;
-//if (!results[2]) return '';
-//alert(decodeURIComponent(results[2].replace(/\+/g, " ")));
-//return decodeURIComponent(results[2].replace(/\+/g, " "));
-//}
 
 function getUser(user)
 {
@@ -26,7 +15,7 @@ function getUser(user)
  for (var i=0;i<vars.length;i++) {
          var pair = vars[i].split("=");
          if(pair[0] == user){            	   
-      	   userTosplay = pair[1];}
+        	userToDisplay = pair[1];}
  }       
  return(false);
 }
@@ -158,7 +147,7 @@ var UIHelper = function(data, graph) {
   // How often should the average be updated?
   var intervalsPerAverage = 5;
   // How far back should we fetch data at every interval?
-  var rangeOfDataToFetchEveryIntervalInSeconds = 1;
+  var rangeOfDataToFetchEveryIntervalInSeconds = 120;
   // how many measurements does average display?
   var numMeasurementToDisplay = 6;
   // Keep track of when we last updated the average.
@@ -228,10 +217,9 @@ var UIHelper = function(data, graph) {
     // Update the graph with our new data, transformed into the data series
     // format Flot expects
     graph.update(data.toFlotData());
-
-    // Update the last updated display
-    setLastUpdatedBy(data.getLastUpdatedBy());
-
+    
+    // Update the user displayed
+    setUserDisplayed(userToDisplay);
     // If we're still running schedule this method to be executed again at the
     // next interval
     if (running) {
@@ -250,15 +238,16 @@ var UIHelper = function(data, graph) {
   }
 
   /**
-   * Set the last updated label, if one is provided.
+   * Set the user displayed
    *
    * @param {string}
    *          s The new host that last updated record data. If one is not
    *          provided the last updated label will not be shown.
    */
-  var setLastUpdatedBy = function(s) {
-    var message = s ? "Data last updated by: " + s : "";
-    $("#updatedBy").text(message);
+  var setUserDisplayed = function(s) {
+    var message = s ? s : "";
+    $("#userDisplayed").text(message);
+//    alert("user displayed is "+ s);
   }
 
   return {
@@ -281,7 +270,7 @@ var UIHelper = function(data, graph) {
     decorate : function() {
       setDescription("This graph displays the last "
           + graph.getTotalDurationToGraphInSeconds()
-          + " seconds of EEG sensor measurement records.");
+          + " seconds of EEG sensor measurement records for: \n"+ userToDisplay);
       
       $("#measurementDescription").text("Average values of all " + numMeasurementToDisplay + " measurements in the recent "
               + (intervalsPerAverage * updateIntervalInMillis) + " ms: ");
@@ -357,8 +346,6 @@ var MeasurementData = function() {
   var counts = {};
   var averages = {};
   
-  // Host last updated the records.
-  var lastUpdatedBy;
 
   /**
    * Update the average for each measurement.
@@ -379,29 +366,12 @@ var MeasurementData = function() {
     }
   }
 
-  /**
-   * Set the host that last updated data.
-   *
-   * @param {string}
-   *          host The host that last provided update records.
-   */
-  var setLastUpdatedBy = function(host) {
-    lastUpdatedBy = host;
-  }
-
   return {
     /**
      * @returns {object} The internal representation of record data.
      */
     getData : function() {
       return data;
-    },
-
-    /**
-     * @returns {string} The host that last updated our record data.
-     */
-    getLastUpdatedBy : function() {
-      return lastUpdatedBy;
     },
 
     /**
@@ -438,10 +408,8 @@ var MeasurementData = function() {
     addNewData : function(newMeasurementData) {
 
     	newMeasurementData.forEach(function(record) {
-    		if(record.host==userTosplay){
+    		if(record.host==userToDisplay){
 	        // Update the host who last updated the record
-	        setLastUpdatedBy(record.host);
-	        // Add individual measurement
 	        record.values.forEach(function(measurementValue) {
 	          // Reuse or create a new data series entry for this measurement
 	          measureData = data[measurementValue.measurement] || {
@@ -513,7 +481,7 @@ var MeasurementData = function() {
   }
 }
 
-var userTosplay;
+var userToDisplay;
 var data = new MeasurementData();
 var provider = new MeasurementDataProvider();
 var graph = new Graph();

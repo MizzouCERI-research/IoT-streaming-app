@@ -232,12 +232,14 @@ window.onload= function(){
 	// event handlers
 	function legendClick(e)
 	{
-	  alert( "user clicked event for user: " + e.dataSeries.name );
+//	  alert( "user clicked event for user: " + e.dataSeries.name );
 	  window.location = 'graph.html?user='+ e.dataSeries.name;  
 	}
 
 	function dataClick(e) {
-		alert( "data clicked event for user: " + e.dataSeries.name );
+//		alert( "data clicked event for user: " + e.dataSeries.name );
+		window.location = 'graph.html?user='+ e.dataSeries.name;  
+
 	}
 
 	
