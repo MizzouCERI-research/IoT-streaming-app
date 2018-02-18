@@ -14,6 +14,11 @@ window.onload= function(){
 				title: "Emotion level",
 				suffix: ""
 			},
+			legend: {
+			       cursor:"pointer",
+			       //fontSize: 15,
+			        itemclick: legendClick
+			     },
 			data:[]
 		});	
 		
@@ -32,6 +37,7 @@ window.onload= function(){
 						color: "Blue",
 						yValueFormatString: "0.##",
 						indexLabel: "{y}",
+						click: dataClick,
 						dataPoints: [
 							{ label: "engagement", y: {} },
 							{ label: "focus", y: {} },
@@ -51,6 +57,7 @@ window.onload= function(){
 						color: "Green",
 						yValueFormatString: "0.##",
 						indexLabel: "{y}",
+						click: dataClick,
 						dataPoints: [
 							{ label: "engagement", y: {} },
 							{ label: "focus", y: {} },
@@ -221,6 +228,17 @@ window.onload= function(){
 	     }   
 	  }
 	};
+	
+	// event handlers
+	function legendClick(e)
+	{
+	  alert( "user clicked event for user: " + e.dataSeries.name );
+	}
+
+	function dataClick(e) {
+		alert( "data clicked event for user: " + e.dataSeries.name );
+	}
+
 	
 	
 	var dataAll = new MeasurementData();
