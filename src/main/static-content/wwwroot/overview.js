@@ -233,6 +233,7 @@ window.onload= function(){
 	function legendClick(e)
 	{
 	  alert( "user clicked event for user: " + e.dataSeries.name );
+	  window.location = 'graph.html?user='+ e.dataSeries.name;  
 	}
 
 	function dataClick(e) {
