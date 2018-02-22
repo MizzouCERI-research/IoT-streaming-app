@@ -88,9 +88,9 @@ public class MeasurementWriter {
         AmazonKinesis kinesisClient = new AmazonKinesisClient(credentials, ConfigurationUtils.getClientConfigWithUserAgent());
         kinesisClient.setRegion(region);
         
-        // Creates a stream to write to with 2 shards if it doesn't exist
+        // Creates a stream to write to with 1 shards if it doesn't exist
 			StreamUtils streamUtils = new StreamUtils(kinesisClient);
-			streamUtils.createStreamIfNotExists(streamName, 2);
+			streamUtils.createStreamIfNotExists(streamName, 1);
 			LOG.info(String.format("%s stream is ready for use", streamName));
 
 	        // Repeatedly send measurements with a 1000 milliseconds wait in between
