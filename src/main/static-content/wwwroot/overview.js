@@ -3,8 +3,6 @@ window.onload= function(){
 	var numUsers;
 	var resource = "EEG sensor";
 	var secondsAgo = 1;
-//	var data=[{"name":"user1","userData":[{"label":"engagement","y":0.88},{"label":"focus","y":0.816},{"label":"excitement","y":0.713},{"label":"frustration","y":0.293},{"label":"stress","y":0.175},{"label":"relaxation","y":0.512}]},
-//		      {"name":"user2","userData":[{"label":"engagement","y":0.883},{"label":"focus","y":0.776},{"label":"excitement","y":0.669},{"label":"frustration","y":0.32},{"label":"stress","y":0.2},{"label":"relaxation","y":0.478}]}];
 	var data=[];
 	var chart = new CanvasJS.Chart("chartContainer", {
 			title: {
@@ -23,20 +21,14 @@ window.onload= function(){
 		});	
 		
 	var updateData = function(resource, secondsAgo, callback) {
-		console.log("I am here 1");
 
-		//var localData;
 	    // Fetch data from our data provider
 	    provider.getData(resource, secondsAgo, function(newData) {
-			console.log("I am here 1.1");
 
 	      // Store the data locally
 			dataAll.resetData();
 	    	dataAll.addNewData(newData);
-//	    	dataAll.removeDataOlderThan((new Date()).getTime() - 1000);
-	    	//data=dataAll.getData();
-//	    	str = JSON.stringify(data);
-//	        console.log(str);
+
 	    	updateNumBars(numUsers, chart);
 	        if (callback) {
 		       callback();
@@ -45,7 +37,6 @@ window.onload= function(){
 	};
 
 	var updateNumBars = function (num, paramChart){
-		console.log("I am here 2");
 
 		paramChart.options.data=[];
 		for (var i=1; i<num+1; i++) {
@@ -97,10 +88,6 @@ window.onload= function(){
 		var barColor, name;
 		var dps = new Array(numUsers);		
 		var measurements = ["engagement","focus","excitement","frustration","stress","relaxation"];		
-		console.log("I am here 3");
-	
-//		str = JSON.stringify(paramData);
-//        console.log(str);
 		
 		for (var i=0; i< numUsers; i++){
 			
@@ -156,7 +143,6 @@ window.onload= function(){
 	 * Provides access to records data.
 	 */
 	var MeasurementDataProvider = function() {
-		console.log("I am here 4");
 
 	  var _endpoint = "http://" + location.host + "/api/GetMeasurements";
 	
@@ -191,9 +177,7 @@ window.onload= function(){
 	 * Internal representation of data. 
 	 */
 	var MeasurementData = function() {
-		console.log("I am here 5");
 
-	  //var localData = [];
 	  var dataPerUser={name:{}, resource:{}, timestamp:{}, userData:[]};
 	
 	  return {
@@ -213,10 +197,7 @@ window.onload= function(){
 	     * @param {object} Record data returned by our data provider.
 	     */
 	    addNewData : function(newMeasurementData) {
-			console.log("I am here 5.1");
 			
-//	    	str = JSON.stringify(newMeasurementData);
-//	        console.log(str);				
 			var userSet = new Set();
 			
 	    	newMeasurementData.forEach(function(record) {
@@ -237,19 +218,14 @@ window.onload= function(){
 			                y : measurementValue.value
 			          };
 		          
-		          // Update the measurement data
-	
+		          // Update the measurement data	
 		            dataPerUser.userData.push(measureData);
-	//	            data[j].push(measureData);
 		        });
 		        
 		        data.push(dataPerUser);	
 		        
 	      });   
-	    	numUsers= userSet.size;
-	    	
-//	    	str = JSON.stringify(data);
-//	        console.log(str);
+	    	numUsers= userSet.size;   	
 	    },
 	    
 	    removeDataOlderThan : function(currentTimeStamp) {
@@ -271,33 +247,18 @@ window.onload= function(){
 	// event handlers
 	function legendClick(e)
 	{
-//	  alert( "user clicked event for user: " + e.dataSeries.name );
 	  window.location = 'graph.html?user='+ e.dataSeries.name;  
 	}
 
 	function dataClick(e) {
-//		alert( "data clicked event for user: " + e.dataSeries.name );
 		window.location = 'graph.html?user='+ e.dataSeries.name;  
 
 	}
 
-	
-	
 	var dataAll = new MeasurementData();
 	var provider = new MeasurementDataProvider();
 	
-	// this does not work as there is asynchronous issues
-//	updateData(resource, secondsAgo);
-//	updateNumBars(numUsers, chart);
-//	updateChart(chart, data);	
-//	setInterval(function() {
-//		updateData(resource, secondsAgo);
-//		updateNumBars(numUsers, chart);
-//		updateChart(chart, data);
-//	}, 1000);
-	
-	
-	// this is the correct way of doing it but not quite working so far	
+	// use callbacks to avoid race conditions	
 	updateData(resource, secondsAgo, function(){
 		updateChart(chart, data);
     });	
@@ -306,22 +267,5 @@ window.onload= function(){
 			updateChart(chart, data);
 	    });
 	}, 1000);
-	
-	// this has been working before adding dynamic numUsers variable
-//	updateNumBars(numUsers, chart); 
-//	updateData(resource, secondsAgo, 
-//			function(){
-//		updateChart(chart, data);
-//		});
-//	
-//	setInterval(function() {
-//			
-//		updateNumBars(numUsers, chart);  	
-//		updateData(resource, secondsAgo, 
-//				function(){
-//			updateChart(chart, data);
-//			});
-//	}, 1000);
 
-
-}//window.onload closing parenthesis
+}
