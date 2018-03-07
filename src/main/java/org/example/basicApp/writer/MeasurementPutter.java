@@ -16,11 +16,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 // Sends measurements to Amazon Kinesis.
 public class MeasurementPutter {
     private static final Log LOG = LogFactory.getLog(MeasurementPutter.class);
-   	
-	//private VrMeasurement vrMeasurement;
+
+    //private VrMeasurement vrMeasurement;
     private AmazonKinesis kinesis;
     private String streamName;
-
+    private final int numUsers = 10;
     private final ObjectMapper JSON = new ObjectMapper();
 
     public MeasurementPutter(AmazonKinesis kinesis, String streamName) {
@@ -34,20 +34,22 @@ public class MeasurementPutter {
         //this.vrMeasurement = vrMeasurement;
         this.kinesis = kinesis;
         this.streamName = streamName;
-    }	
+    }
 
     // Send a fixed number of data records to Amazon Kinesis. 
-    public void sendMeasurements(long n, long delayBetweenRecords, TimeUnit unitForDelay) throws InterruptedException {
-        for (int i = 0; i < n && !Thread.currentThread().isInterrupted(); i++) {
-            sendMeasurement();
-            Thread.sleep(unitForDelay.toMillis(delayBetweenRecords));
-        }
-    }
+    //public void sendMeasurements(long n, long delayBetweenRecords, TimeUnit unitForDelay) throws InterruptedException {
+      //  for (int i = 0; i < n && !Thread.currentThread().isInterrupted(); i++) {
+        //    sendMeasurement();
+          //  Thread.sleep(unitForDelay.toMillis(delayBetweenRecords));
+       // }
+   // }
 
     // Continuously sends data records to Amazon Kinesis sequentially
     public void sendMeasurementsIndefinitely(long delayBetweenRecords, TimeUnit unitForDelay) throws InterruptedException {
         while (!Thread.currentThread().isInterrupted()) {
-            sendMeasurement();
+                for (int i=1; i<=numUsers; i++){
+                    sendMeasurement(i);
+                }
             if (delayBetweenRecords > 0) {
                 Thread.sleep(unitForDelay.toMillis(delayBetweenRecords));
             }
@@ -55,9 +57,10 @@ public class MeasurementPutter {
     }
 
     // Send a single record to Amazon Kinesis using PutRecord.
-    private void sendMeasurement() {  
-    	
-    	final VrMeasurement vrMeasurement = new VrMeasurement();    	
+    private void sendMeasurement(int i) {
+
+        final VrMeasurement vrMeasurement = new VrMeasurement();
+        vrMeasurement.setHost("user"+ i);
         byte[] bytes;
         try {
             bytes = JSON.writeValueAsBytes(vrMeasurement);
@@ -66,10 +69,11 @@ public class MeasurementPutter {
             return;
         }
 
+
         PutRecordRequest putRecord = new PutRecordRequest();
         putRecord.setStreamName(streamName);
         putRecord.setPartitionKey("key");
-		putRecord.setData(ByteBuffer.wrap(bytes));
+                putRecord.setData(ByteBuffer.wrap(bytes));
         putRecord.setSequenceNumberForOrdering(null);
 
         try {
@@ -89,4 +93,5 @@ public class MeasurementPutter {
         }
     }
 }
+
 
