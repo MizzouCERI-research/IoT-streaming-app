@@ -13,24 +13,18 @@ import com.amazonaws.services.kinesis.model.ProvisionedThroughputExceededExcepti
 import com.amazonaws.services.kinesis.model.PutRecordRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-/**
- * Sends measurements to Amazon Kinesis.
- */
-
+// Sends measurements to Amazon Kinesis.
 public class MeasurementPutter {
     private static final Log LOG = LogFactory.getLog(MeasurementPutter.class);
-    
-	
+   	
 	//private VrMeasurement vrMeasurement;
     private AmazonKinesis kinesis;
     private String streamName;
 
     private final ObjectMapper JSON = new ObjectMapper();
 
-    public MeasurementPutter(/*VrMeasurement vrMeasurement,*/ AmazonKinesis kinesis, String streamName) {
-        //if (vrMeasurement == null) {
-        //   throw new IllegalArgumentException("vrMeasurement must not be null");
-        //}
+    public MeasurementPutter(AmazonKinesis kinesis, String streamName) {
+
         if (kinesis == null) {
             throw new IllegalArgumentException("kinesis must not be null");
         }
@@ -42,17 +36,7 @@ public class MeasurementPutter {
         this.streamName = streamName;
     }	
 
-    /**
-     * Send a fixed number of HTTP Referrer pairs to Amazon Kinesis. This sends them sequentially.
-     * If you require more throughput consider using multiple {@link HttpReferrerKinesisPutter}s.
-     *
-     * @param n The number of pairs to send to Amazon Kinesis.
-     * @param delayBetweenRecords The amount of time to wait in between sending records. If this is <= 0 it will be
-     *        ignored.
-     * @param unitForDelay The unit of time to interpret the provided delay as.
-     *
-     * @throws InterruptedException Interrupted while waiting to send the next pair.
-     */
+    // Send a fixed number of data records to Amazon Kinesis. 
     public void sendMeasurements(long n, long delayBetweenRecords, TimeUnit unitForDelay) throws InterruptedException {
         for (int i = 0; i < n && !Thread.currentThread().isInterrupted(); i++) {
             sendMeasurement();
@@ -60,16 +44,7 @@ public class MeasurementPutter {
         }
     }
 
-    /**
-     * Continuously sends HTTP Referrer pairs to Amazon Kinesis sequentially. This will only stop if interrupted. If you
-     * require more throughput consider using multiple {@link HttpReferrerKinesisPutter}s.
-     *
-     * @param delayBetweenRecords The amount of time to wait in between sending records. If this is <= 0 it will be
-     *        ignored.
-     * @param unitForDelay The unit of time to interpret the provided delay as.
-     *
-     * @throws InterruptedException Interrupted while waiting to send the next pair.
-     */
+    // Continuously sends data records to Amazon Kinesis sequentially
     public void sendMeasurementsIndefinitely(long delayBetweenRecords, TimeUnit unitForDelay) throws InterruptedException {
         while (!Thread.currentThread().isInterrupted()) {
             sendMeasurement();
@@ -79,14 +54,10 @@ public class MeasurementPutter {
         }
     }
 
-    /**
-     * Send a single record to Amazon Kinesis using PutRecord.
-     */
+    // Send a single record to Amazon Kinesis using PutRecord.
     private void sendMeasurement() {  
     	
-        // Repeatedly send measurements with a 1000 milliseconds wait in between
-    	final VrMeasurement vrMeasurement = new VrMeasurement();	
-    	
+    	final VrMeasurement vrMeasurement = new VrMeasurement();    	
         byte[] bytes;
         try {
             bytes = JSON.writeValueAsBytes(vrMeasurement);
@@ -97,11 +68,8 @@ public class MeasurementPutter {
 
         PutRecordRequest putRecord = new PutRecordRequest();
         putRecord.setStreamName(streamName);
-        // We use the resource as the partition key so we can accurately calculate totals for a given resource
         putRecord.setPartitionKey("key");
-        
 		putRecord.setData(ByteBuffer.wrap(bytes));
-        // Order is not important for this application so we do not send a SequenceNumberForOrdering
         putRecord.setSequenceNumberForOrdering(null);
 
         try {

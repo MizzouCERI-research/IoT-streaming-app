@@ -2,7 +2,7 @@ window.onload= function(){
 
 	var numUsers;
 	var resource = "EEG sensor";
-	var secondsAgo = 1;
+	var secondsAgo = 5;
 	var data=[];
 	var chart = new CanvasJS.Chart("chartContainer", {
 			title: {

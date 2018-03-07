@@ -63,7 +63,7 @@ public class WebServer {
         // Static resource context
         ResourceHandler resources = new ResourceHandler();
         resources.setDirectoriesListed(false);
-        resources.setWelcomeFiles(new String[] { "overview.html" });
+        resources.setWelcomeFiles(new String[] { "graph.html" });
         resources.setResourceBase(wwwroot);
 
         // Create the servlet to handle records
