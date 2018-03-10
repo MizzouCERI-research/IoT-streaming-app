@@ -2,15 +2,8 @@ package org.example.basicApp.client;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
 import com.amazonaws.services.kinesis.clientlibrary.exceptions.InvalidStateException;
 import com.amazonaws.services.kinesis.clientlibrary.exceptions.ShutdownException;
 import com.amazonaws.services.kinesis.clientlibrary.exceptions.ThrottlingException;
@@ -19,6 +12,7 @@ import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessorC
 import com.amazonaws.services.kinesis.clientlibrary.types.ShutdownReason;
 import com.amazonaws.services.kinesis.model.Record;
 import org.example.basicApp.model.VrMeasurement;
+import org.example.basicApp.model.RawMeasurement;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -105,17 +99,22 @@ public class MeasurementRecordProcessor implements IRecordProcessor {
     public void processSingleRecord(Record r) {
      
         // Deserialize each record as an encoded JSON String of the type provided
-        VrMeasurement data = null;
+        RawMeasurement rawData= null;
+    	VrMeasurement data = new VrMeasurement();
         	
         try {
-           data = objectMapper.readValue(r.getData().array(), VrMeasurement.class);           
-           LOG.info(String.format("one record has been processed......... %s", data.toString()));               
+        	rawData = objectMapper.readValue(r.getData().array(), RawMeasurement.class); 
         } catch (IOException e) {
            LOG.warn("Skipping record. Unable to parse record into Measurements. Partition Key: "
                 + r.getPartitionKey() + ". Sequence Number: " + r.getSequenceNumber(),e);           
         }        
-        // Persist the data record into queue
-        if (data != null) {
+        // process rawData and generate lightweighted data, and then persist the data record into queue
+        if (rawData != null) {     
+        	LOG.info(String.format("one rawData record has been retrieved from stream ..."));
+        	data.setResource(rawData.getResource());
+        	data.setTimeStamp(rawData.getTimeStamp());
+        	data.setHost(rawData.getHost());  
+        	LOG.info(String.format("one record has been processed, processed data include: %s", data.toString()));
             dbWriter.pushToQueue(data);
         }        
      }

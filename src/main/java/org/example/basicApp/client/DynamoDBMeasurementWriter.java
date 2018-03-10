@@ -179,22 +179,8 @@ public class DynamoDBMeasurementWriter {
     protected void sendQueueToDynamoDB(List<Map<String, AttributeValue>> buffer) throws InterruptedException {
         // Block while waiting for data
         buffer.add(queue.take());
-
         queue.drainTo(buffer);
         
-        // skip using mapper as it is not working for now
-//        try {
-//            long start = System.nanoTime();
-//            // Write the contents of the buffer as records to our table
-//            List<FailedBatch> failures = mapper.batchWrite(buffer, Collections.emptyList());
-//            long end = System.nanoTime();
-//
-//            for (FailedBatch failure : failures) {
-//                LOG.warn("Error sending measurement batch to DynamoDB. This will not be retried!", failure.getException());
-//            }
-//        } catch (Exception ex) {
-//            LOG.error("Error sending new measurements to DynamoDB. Some measurements may not be persisted.", ex);
-//        }
         try {
         	
 	        for (Map<String, AttributeValue> singleRecord : buffer) {

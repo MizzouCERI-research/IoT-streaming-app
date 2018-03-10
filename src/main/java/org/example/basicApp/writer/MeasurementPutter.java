@@ -7,6 +7,7 @@ import java.lang.String;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.example.basicApp.model.VrMeasurement;
+import org.example.basicApp.model.RawMeasurement;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.services.kinesis.AmazonKinesis;
 import com.amazonaws.services.kinesis.model.ProvisionedThroughputExceededException;
@@ -17,7 +18,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class MeasurementPutter {
     private static final Log LOG = LogFactory.getLog(MeasurementPutter.class);
 
-    //private VrMeasurement vrMeasurement;
     private AmazonKinesis kinesis;
     private String streamName;
     private final int numUsers = 10;
@@ -31,7 +31,6 @@ public class MeasurementPutter {
         if (streamName == null || streamName.isEmpty()) {
             throw new IllegalArgumentException("streamName must not be null or empty");
         }
-        //this.vrMeasurement = vrMeasurement;
         this.kinesis = kinesis;
         this.streamName = streamName;
     }
@@ -59,13 +58,13 @@ public class MeasurementPutter {
     // Send a single record to Amazon Kinesis using PutRecord.
     private void sendMeasurement(int i) {
 
-        final VrMeasurement vrMeasurement = new VrMeasurement();
-        vrMeasurement.setHost("user"+ i);
+        final RawMeasurement rawMeasurement = new RawMeasurement();
+        rawMeasurement.setHost("user"+ i);
         byte[] bytes;
         try {
-            bytes = JSON.writeValueAsBytes(vrMeasurement);
+            bytes = JSON.writeValueAsBytes(rawMeasurement);
         } catch (IOException e) {
-            LOG.warn("Skipping vrMeasurement. Unable to serialize: '" + vrMeasurement + "'", e);
+            LOG.warn("Skipping rawMeasurement. Unable to serialize: '" + rawMeasurement + "'", e);
             return;
         }
 
@@ -78,7 +77,7 @@ public class MeasurementPutter {
 
         try {
             kinesis.putRecord(putRecord);
-            LOG.info(String.format("one data record is put in stream, data include: %s \n", vrMeasurement.toString()));
+            LOG.info(String.format("one data record is put in stream, data include: %s \n", rawMeasurement.toString()));
         } catch (ProvisionedThroughputExceededException ex) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(String.format("Thread %s's Throughput exceeded. Waiting 10ms", Thread.currentThread().getName()));
