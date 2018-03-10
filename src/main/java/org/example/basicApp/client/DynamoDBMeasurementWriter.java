@@ -60,7 +60,7 @@ public class DynamoDBMeasurementWriter {
     private static final Log LOG = LogFactory.getLog(DynamoDBMeasurementWriter.class);
 
     // Generate UTC timestamps
-    private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+    private static final TimeZone UTC = TimeZone.getTimeZone("America/Chicago");
 
     // generate a dynamodb mapper
 //    private DynamoDBMapper mapper;
