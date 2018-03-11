@@ -154,7 +154,7 @@ public class VrMeasurement {
     }
     
     public static String toISO8601UTC(Date date) {
-  	  TimeZone tz = TimeZone.getTimeZone("America/Chicago");
+  	  TimeZone tz = TimeZone.getTimeZone("UTC");
   	  DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
   	  df.setTimeZone(tz);
   	  return df.format(date);

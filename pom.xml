@@ -9,9 +9,9 @@
   <url>http://maven.apache.org</url>
   
   <properties>
-     <sample-application.name>testKinesisApp</sample-application.name>
-     <sample-application.stream>wangso-stream</sample-application.stream>
-     <sample-application.measurement-table>measurementDBTable</sample-application.measurement-table>
+     <sample-application.name>cloud5user1secLargeDataHome</sample-application.name>
+     <sample-application.stream>cloud5user1secLargeDataHomeStream</sample-application.stream>
+     <sample-application.measurement-table>cloud5user1secLargeDataHomeDB</sample-application.measurement-table>
      <sample-application.region>us-east-1</sample-application.region>
      <amazon-kinesis-client.version>1.2.0</amazon-kinesis-client.version>
      <jetty.version>8.1.9.v20130131</jetty.version>

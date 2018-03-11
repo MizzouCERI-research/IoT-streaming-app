@@ -20,7 +20,7 @@ public class MeasurementPutter {
 
     private AmazonKinesis kinesis;
     private String streamName;
-    private final int numUsers = 10;
+    private final int numUsers = 5;
     private final ObjectMapper JSON = new ObjectMapper();
 
     public MeasurementPutter(AmazonKinesis kinesis, String streamName) {

@@ -113,6 +113,9 @@ public class MeasurementRecordProcessor implements IRecordProcessor {
         	LOG.info(String.format("one rawData record has been retrieved from stream ..."));
         	data.setResource(rawData.getResource());
         	data.setTimeStamp(rawData.getTimeStamp());
+        	
+        	LOG.info(String.format("rawData timestamp is : %s", rawData.getTimeStamp()));
+        	
         	data.setHost(rawData.getHost());  
         	LOG.info(String.format("one record has been processed, processed data include: %s", data.toString()));
             dbWriter.pushToQueue(data);
