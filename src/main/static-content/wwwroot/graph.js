@@ -1,3 +1,10 @@
+/*
+*
+* Developed and adpated by Songjie Wang
+* Department of EECS
+* University of Missouri
+*
+*/
 
 // When the page loads create our graph and start updating it.
 $(function() {
@@ -155,7 +162,7 @@ var UIHelper = function(data, graph) {
   // Controls the update loop.
   var running = true;
   // Set the active resource to query for when updating data.
-  var activeResource = "EEG sensor";
+  var activeResource = "Muse Sensor";
 
   /**
    * Fetch records from the last secondsAgo seconds.

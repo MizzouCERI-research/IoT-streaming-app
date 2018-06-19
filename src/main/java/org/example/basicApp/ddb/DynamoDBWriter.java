@@ -1,3 +1,11 @@
+/*
+*
+* Developed by Songjie Wang
+* Department of EECS
+* University of Missouri
+*
+*/
+
 package org.example.basicApp.ddb;
 
 import java.text.DateFormat;
@@ -59,7 +67,7 @@ public class DynamoDBWriter {
     private static final Log LOG = LogFactory.getLog(DynamoDBWriter.class);
 	private static final float deviation = 0.1f;
     static AmazonDynamoDB dynamoDB;
-    private static final int numUsers=6;
+    private static final int numUsers=1;
     private static DdbRecordToWrite ddbRecordToWrite;
     
     public static void main(String[] args) throws Exception {

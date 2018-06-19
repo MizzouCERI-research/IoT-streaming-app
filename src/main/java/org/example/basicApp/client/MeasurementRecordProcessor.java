@@ -1,3 +1,11 @@
+/*
+*
+* Developed and adpated by Songjie Wang
+* Department of EECS
+* University of Missouri
+*
+*/
+
 package org.example.basicApp.client;
 
 import java.io.IOException;
@@ -12,7 +20,7 @@ import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessorC
 import com.amazonaws.services.kinesis.clientlibrary.types.ShutdownReason;
 import com.amazonaws.services.kinesis.model.Record;
 import org.example.basicApp.model.VrMeasurement;
-import org.example.basicApp.model.RawMeasurement;
+//import org.example.basicApp.model.RawMeasurement;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -99,24 +107,24 @@ public class MeasurementRecordProcessor implements IRecordProcessor {
     public void processSingleRecord(Record r) {
      
         // Deserialize each record as an encoded JSON String of the type provided
-        RawMeasurement rawData= null;
+        VrMeasurement Data= null;
     	VrMeasurement data = new VrMeasurement();
         	
         try {
-        	rawData = objectMapper.readValue(r.getData().array(), RawMeasurement.class); 
+        	Data = objectMapper.readValue(r.getData().array(), VrMeasurement.class); 
         } catch (IOException e) {
            LOG.warn("Skipping record. Unable to parse record into Measurements. Partition Key: "
                 + r.getPartitionKey() + ". Sequence Number: " + r.getSequenceNumber(),e);           
         }        
-        // process rawData and generate lightweighted data, and then persist the data record into queue
-        if (rawData != null) {     
-        	LOG.info(String.format("one rawData record has been retrieved from stream ..."));
-        	data.setResource(rawData.getResource());
-        	data.setTimeStamp(rawData.getTimeStamp());
+        // process Data and generate lightweighted data, and then persist the data record into queue
+        if (Data != null) {     
+        	LOG.info(String.format("one Data record has been retrieved from stream ..."));
+        	data.setResource(Data.getResource());
+        	data.setTimeStamp(Data.getTimeStamp());
         	
-        	LOG.info(String.format("rawData timestamp is : %s", rawData.getTimeStamp()));
+        	LOG.info(String.format("Data timestamp is : %s", Data.getTimeStamp()));
         	
-        	data.setHost(rawData.getHost());  
+        	data.setHost(Data.getHost());  
         	LOG.info(String.format("one record has been processed, processed data include: %s", data.toString()));
             dbWriter.pushToQueue(data);
         }        

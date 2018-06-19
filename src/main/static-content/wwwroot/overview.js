@@ -1,7 +1,16 @@
+/*
+*
+* Developed by Songjie Wang
+* Department of EECS
+* University of Missouri
+*
+*/
+
+
 window.onload= function(){
 
 	var numUsers;
-	var resource = "EEG sensor";
+	var resource = "Muse Sensor";
 	var secondsAgo = 5;
 	var data=[];
 	var chart = new CanvasJS.Chart("chartContainer", {

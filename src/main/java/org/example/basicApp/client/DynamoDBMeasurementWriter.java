@@ -1,3 +1,11 @@
+/*
+*
+* Developed and adpated by Songjie Wang
+* Department of EECS
+* University of Missouri
+*
+*/
+
 package org.example.basicApp.client;
 
 import java.net.UnknownHostException;

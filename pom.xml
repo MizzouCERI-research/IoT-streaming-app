@@ -9,9 +9,9 @@
   <url>http://maven.apache.org</url>
   
   <properties>
-     <sample-application.name>cloud5user1secLargeData</sample-application.name>
-     <sample-application.stream>cloud5user1secLargeDataStream</sample-application.stream>
-     <sample-application.measurement-table>cloud5user1secLargeDataDB</sample-application.measurement-table>
+     <sample-application.name>visualApp</sample-application.name>
+     <sample-application.stream>myStream</sample-application.stream>
+     <sample-application.measurement-table>myDB</sample-application.measurement-table>
      <sample-application.region>us-east-1</sample-application.region>
      <amazon-kinesis-client.version>1.2.0</amazon-kinesis-client.version>
      <jetty.version>8.1.9.v20130131</jetty.version>
@@ -22,6 +22,12 @@
             <groupId>com.amazonaws</groupId>
             <artifactId>amazon-kinesis-client</artifactId>
             <version>${amazon-kinesis-client.version}</version>
+        </dependency>
+
+         <dependency>
+            <groupId>org.example.basicApp.muse</groupId>
+            <artifactId>oscP5</artifactId>
+            <version>1.0</version>
         </dependency>
 
         <dependency>
@@ -85,6 +91,27 @@
                   </execution>
               </executions>
           </plugin>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-install-plugin</artifactId>
+              <version>2.4</version>
+              <executions>
+                  <execution>
+                      <phase>initialize</phase>
+                      <goals>
+                          <goal>install-file</goal>
+                      </goals>
+                      <configuration>
+			  <groupId>org.example.basicApp.muse</groupId>
+			  <artifactId>oscP5</artifactId>
+			  <version>1.0</version>
+			  <packaging>jar</packaging>
+                          <file>${basedir}/lib/oscP5.jar</file>
+                      </configuration>
+                  </execution>
+              </executions>
+          </plugin>
+
       </plugins>
   </build>
  
@@ -195,7 +222,27 @@
                               <argument>${sample-application.name}</argument>
                               <argument>${sample-application.stream}</argument>
                               <argument>${sample-application.measurement-table}</argument>
-			                  <argument>${sample-application.region}</argument>
+			      <argument>${sample-application.region}</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+      </profile>
+	<profile>
+            <!-- Muse app to collect data from server -->
+            <id>museApp</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.2.1</version>
+                        <configuration>
+                            <mainClass>org.example.basicApp.muse.MuseOscServer</mainClass>
+                            <arguments>
+                              <argument>${sample-application.measurement-table}</argument>
+			      <argument>${sample-application.region}</argument>
                             </arguments>
                         </configuration>
                     </plugin>

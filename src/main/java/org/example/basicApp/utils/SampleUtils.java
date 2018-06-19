@@ -1,3 +1,11 @@
+/*
+*
+* Developed and adpated by Songjie Wang
+* Department of EECS
+* University of Missouri
+*
+*/
+
 package org.example.basicApp.utils;
 
 import com.amazonaws.ClientConfiguration;
@@ -15,7 +23,7 @@ public class SampleUtils {
         // Separate regions of the UserAgent with a space
         userAgent.append(" ");
         // Append the repository name followed by version number of the sample
-        userAgent.append("testKinesisApp/1.3");
+        userAgent.append("visualApp/7.0");
         newConfig.setUserAgent(userAgent.toString());
         return newConfig;
     }

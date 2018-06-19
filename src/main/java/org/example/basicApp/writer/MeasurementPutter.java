@@ -1,3 +1,11 @@
+/*
+*
+* Developed and adpated by Songjie Wang
+* Department of EECS
+* University of Missouri
+*
+*/
+
 package org.example.basicApp.writer;
 
 import java.io.IOException;
@@ -20,7 +28,7 @@ public class MeasurementPutter {
 
     private AmazonKinesis kinesis;
     private String streamName;
-    private final int numUsers = 5;
+    private final int numUsers = 1;
     private final ObjectMapper JSON = new ObjectMapper();
 
     public MeasurementPutter(AmazonKinesis kinesis, String streamName) {
@@ -58,13 +66,13 @@ public class MeasurementPutter {
     // Send a single record to Amazon Kinesis using PutRecord.
     private void sendMeasurement(int i) {
 
-        final RawMeasurement rawMeasurement = new RawMeasurement();
-        rawMeasurement.setHost("user"+ i);
+	final VrMeasurement vrMeasurement = new VrMeasurement();
+        vrMeasurement.setHost("user"+ i);
         byte[] bytes;
         try {
-            bytes = JSON.writeValueAsBytes(rawMeasurement);
+            bytes = JSON.writeValueAsBytes(vrMeasurement);
         } catch (IOException e) {
-            LOG.warn("Skipping rawMeasurement. Unable to serialize: '" + rawMeasurement + "'", e);
+            LOG.warn("Skipping vrMeasurement. Unable to serialize: '" + vrMeasurement + "'", e);
             return;
         }
 
@@ -77,7 +85,7 @@ public class MeasurementPutter {
 
         try {
             kinesis.putRecord(putRecord);
-            LOG.info(String.format("one data record is put in stream, data include: %s \n", rawMeasurement.toString()));
+            LOG.info(String.format("one data record is put in stream, data include: %s \n", vrMeasurement.toString()));
         } catch (ProvisionedThroughputExceededException ex) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(String.format("Thread %s's Throughput exceeded. Waiting 10ms", Thread.currentThread().getName()));

@@ -1,3 +1,11 @@
+/*
+*
+* Developed and adpated by Songjie Wang
+* Department of EECS
+* University of Missouri
+*
+*/
+
 package org.example.basicApp.utils;
 
 import com.amazonaws.ClientConfiguration;
@@ -7,8 +15,8 @@ import com.amazonaws.ClientConfiguration;
  */
 public class ConfigurationUtils {
 
-    private static final String APPLICATION_NAME = "testKinesisApp";
-    private static final String VERSION = "1.0.0";
+    private static final String APPLICATION_NAME = "visualApp";
+    private static final String VERSION = "7.0.0";
 
     public static ClientConfiguration getClientConfigWithUserAgent() {
         final ClientConfiguration config = new ClientConfiguration();

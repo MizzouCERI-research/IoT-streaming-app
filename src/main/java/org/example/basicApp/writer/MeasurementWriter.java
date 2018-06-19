@@ -1,3 +1,10 @@
+/*
+*
+* Developed and adpated by Songjie Wang
+* Department of EECS
+* University of Missouri
+*
+*/
 
 package org.example.basicApp.writer;
 
@@ -56,7 +63,7 @@ public class MeasurementWriter {
         
         // Creates a stream to write to with 2 shards
 		StreamUtils streamUtils = new StreamUtils(kinesisClient);
-		streamUtils.createStreamIfNotExists(streamName, 2);
+		streamUtils.createStreamIfNotExists(streamName, 1);
 		LOG.info(String.format("%s stream is ready for use", streamName));
 
         // Repeatedly send measurements with a 1000 milliseconds wait in between
