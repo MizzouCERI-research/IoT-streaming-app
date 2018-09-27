@@ -37,7 +37,7 @@ public class RawMeasurement {
         
         this.resource = "EEG sensor";
         this.timestamp = toISO8601UTC(date);
-        this.host = "user1";    
+        this.host = "user";    
         this.rawData = generateRawData();
            
     }

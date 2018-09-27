@@ -23,21 +23,9 @@ import java.util.TimeZone;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.Random;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper.FailedBatch;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import org.example.basicApp.model.VrMeasurement;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.TimeZone;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.example.basicApp.model.DdbRecordToWrite;
@@ -84,6 +72,9 @@ public class DynamoDBMeasurementWriter {
     // The thread to use for sending counts to DynamoDB.
     private Thread dynamoDBSender;
 
+	private Date time1 = new Date();
+	private Date time2 = new Date();
+    private Date time3 = new Date();
 
     // Create a new persister to send data to Amazon DynamoDB.
     public DynamoDBMeasurementWriter (AmazonDynamoDB dynamoDB, String dynamoTableName) {
@@ -189,12 +180,17 @@ public class DynamoDBMeasurementWriter {
         buffer.add(queue.take());
         queue.drainTo(buffer);
         
+		time1.setTime(System.currentTimeMillis());
+		LOG.info(String.format("Data in queue have been drained into buffer at %s \n", toISO8601UTC(time1)));
+
         try {
         	
 	        for (Map<String, AttributeValue> singleRecord : buffer) {
 	            PutItemRequest putItemRequest = new PutItemRequest(dynamoTable, singleRecord);
 	            PutItemResult putItemResult = dynamoDB.putItem(putItemRequest);
-	            System.out.println("Result: one data record has been persisted into dynamoDB... \n"+ putItemResult);	 
+	            System.out.println("Result: one data record has been persisted into dynamoDB... \n"+ putItemResult);	
+				time2.setTime(System.currentTimeMillis());
+				LOG.info(String.format("The current record was written into dynamoDB at %s \n", toISO8601UTC(time2)));
 	        }
 	        
         }catch (AmazonServiceException ase) {
@@ -210,7 +206,9 @@ public class DynamoDBMeasurementWriter {
                     + "a serious internal problem while trying to communicate with AWS, "
                     + "such as not being able to access the network.");
             System.out.println("Error Message: " + ace.getMessage());
-        }        
+        }		
+        time3.setTime(System.currentTimeMillis());
+				LOG.info(String.format("All records in buffer have been written into dynamoDB at %s \n", toISO8601UTC(time3)));
     }
      
     // generate map data structure from data records
@@ -223,4 +221,12 @@ public class DynamoDBMeasurementWriter {
         item.put("values", new AttributeValue(record.getValues().toString()));
         return item;
     }
+
+	public static String toISO8601UTC(Date date) {
+  	  TimeZone tz = TimeZone.getTimeZone("UTC");
+  	  DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+  	  df.setTimeZone(tz);
+  	  return df.format(date);
+  	}
+
 }

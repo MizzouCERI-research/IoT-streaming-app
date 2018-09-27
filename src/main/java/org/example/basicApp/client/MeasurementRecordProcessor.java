@@ -9,6 +9,10 @@
 package org.example.basicApp.client;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,7 +24,7 @@ import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessorC
 import com.amazonaws.services.kinesis.clientlibrary.types.ShutdownReason;
 import com.amazonaws.services.kinesis.model.Record;
 import org.example.basicApp.model.VrMeasurement;
-//import org.example.basicApp.model.RawMeasurement;
+import org.example.basicApp.model.RawMeasurement;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -47,7 +51,11 @@ public class MeasurementRecordProcessor implements IRecordProcessor {
     private static final long CHECKPOINT_INTERVAL_MILLIS = 60000L;
     private long nextCheckpointTimeInMillis;
     
-    
+	private Date time1 = new Date();
+	private Date time2 = new Date();
+    private Date time3 = new Date();
+	private Date time4 = new Date();
+
     // Create a new processor with the dbWriter to write data to dynamoDB    
     public MeasurementRecordProcessor(DynamoDBMeasurementWriter dbWriter) {
 
@@ -106,27 +114,37 @@ public class MeasurementRecordProcessor implements IRecordProcessor {
     // process a single record
     public void processSingleRecord(Record r) {
      
-        // Deserialize each record as an encoded JSON String of the type provided
-        VrMeasurement Data= null;
+	// Deserialize each record as an encoded JSON String of the type provided
+        RawMeasurement rawData= null;
     	VrMeasurement data = new VrMeasurement();
-        	
+        time1.setTime(System.currentTimeMillis());
+		LOG.info(String.format("One record starts to be read from stream at %s \n", toISO8601UTC(time1)));	
         try {
-        	Data = objectMapper.readValue(r.getData().array(), VrMeasurement.class); 
+        	rawData = objectMapper.readValue(r.getData().array(), RawMeasurement.class); 
         } catch (IOException e) {
            LOG.warn("Skipping record. Unable to parse record into Measurements. Partition Key: "
                 + r.getPartitionKey() + ". Sequence Number: " + r.getSequenceNumber(),e);           
         }        
-        // process Data and generate lightweighted data, and then persist the data record into queue
-        if (Data != null) {     
-        	LOG.info(String.format("one Data record has been retrieved from stream ..."));
-        	data.setResource(Data.getResource());
-        	data.setTimeStamp(Data.getTimeStamp());
+
+		time2.setTime(System.currentTimeMillis());
+		LOG.info(String.format("One record has been read from stream at %s \n", toISO8601UTC(time2)));
+
+        // process rawData and generate lightweighted data, and then persist the data record into queue
+        if (rawData != null) {     
+        	LOG.info(String.format("one rawData record has been retrieved from stream ..."));
+        	data.setResource(rawData.getResource());
+        	data.setTimeStamp(rawData.getTimeStamp());
         	
-        	LOG.info(String.format("Data timestamp is : %s", Data.getTimeStamp()));
+        	LOG.info(String.format("rawData timestamp is : %s", rawData.getTimeStamp()));
         	
-        	data.setHost(Data.getHost());  
-        	LOG.info(String.format("one record has been processed, processed data include: %s", data.toString()));
+        	data.setHost(rawData.getHost());  
+			time3.setTime(System.currentTimeMillis());
+			LOG.info(String.format("One record has been processed at %s \n", toISO8601UTC(time3)));
+        	LOG.info(String.format("Processed data include: %s \n", data.toString()));			
+
             dbWriter.pushToQueue(data);
+			time4.setTime(System.currentTimeMillis());
+			LOG.info(String.format("Processed data has been push into queue at %s \n", toISO8601UTC(time4)));
         }        
      }
 
@@ -177,5 +195,13 @@ public class MeasurementRecordProcessor implements IRecordProcessor {
                 LOG.debug("Interrupted sleep", e);
             }
         }
-    }    
+    }
+
+	public static String toISO8601UTC(Date date) {
+  	  TimeZone tz = TimeZone.getTimeZone("UTC");
+  	  DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+  	  df.setTimeZone(tz);
+  	  return df.format(date);
+  	}    
 }
+
