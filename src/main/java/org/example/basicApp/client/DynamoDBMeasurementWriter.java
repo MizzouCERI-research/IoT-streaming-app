@@ -208,7 +208,8 @@ public class DynamoDBMeasurementWriter {
             System.out.println("Error Message: " + ace.getMessage());
         }		
         time3.setTime(System.currentTimeMillis());
-				LOG.info(String.format("All records in buffer have been written into dynamoDB at %s \n", toISO8601UTC(time3)));
+	LOG.info(String.format("All records in buffer have been written into dynamoDB at %s \n", toISO8601UTC(time3)));
+	LOG.info(String.format("-------------------------------------------------------------------------------------- \n"));
     }
      
     // generate map data structure from data records
