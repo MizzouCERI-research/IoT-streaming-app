@@ -11,6 +11,7 @@ package org.example.basicApp.client;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.List;
@@ -51,6 +52,7 @@ public class MeasurementRecordProcessor implements IRecordProcessor {
     private static final long CHECKPOINT_INTERVAL_MILLIS = 60000L;
     private long nextCheckpointTimeInMillis;
     
+	private Date dataTimeStamp = new Date();
 	private Date time1 = new Date();
 	private Date time2 = new Date();
     private Date time3 = new Date();
@@ -125,9 +127,9 @@ public class MeasurementRecordProcessor implements IRecordProcessor {
            LOG.warn("Skipping record. Unable to parse record into Measurements. Partition Key: "
                 + r.getPartitionKey() + ". Sequence Number: " + r.getSequenceNumber(),e);           
         }        
-
 		time2.setTime(System.currentTimeMillis());
 		LOG.info(String.format("One record has been read from stream at %s \n", toISO8601UTC(time2)));
+		LOG.info(String.format("time needed for reading data from stream is %d \n", (time2.getTime() - time1.getTime())));
 
         // process rawData and generate lightweighted data, and then persist the data record into queue
         if (rawData != null) {     
@@ -136,7 +138,10 @@ public class MeasurementRecordProcessor implements IRecordProcessor {
         	data.setTimeStamp(rawData.getTimeStamp());
         	
         	LOG.info(String.format("rawData timestamp is : %s", rawData.getTimeStamp()));
-        	
+			
+			dataTimeStamp = toDateFormat(rawData.getTimeStamp());
+        	LOG.info(String.format("rawData timestamp converted to Date format which is : %d \n", dataTimeStamp.getTime()));
+			LOG.info(String.format("time needed since data was generated to data retrived from stream is %d \n", ( time2.getTime() - dataTimeStamp.getTime())));
         	data.setHost(rawData.getHost());  
 			time3.setTime(System.currentTimeMillis());
 			LOG.info(String.format("One record has been processed at %s \n", toISO8601UTC(time3)));
@@ -202,6 +207,21 @@ public class MeasurementRecordProcessor implements IRecordProcessor {
   	  DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
   	  df.setTimeZone(tz);
   	  return df.format(date);
-  	}    
+  	} 
+
+	public static Date toDateFormat (String simpleDate) {
+	  TimeZone tz = TimeZone.getTimeZone("UTC");
+  	  DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+  	  df.setTimeZone(tz);
+	  Date d = new Date();
+	  try{
+	    d = df.parse(simpleDate);
+	  }
+	  catch (ParseException e){
+	    LOG.error("Cannot parse simpleDateFormat to dateFormat \n", e);
+	  }
+	  return d;
+	}
+   
 }
 

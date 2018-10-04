@@ -70,10 +70,10 @@ public class MeasurementPutter {
 			LOG.info(String.format("time after written into stream is %s \n", toISO8601UTC(time2)));
 			LOG.info(String.format("time differnce before and after written into stream is %d \n", (time2.getTime() - time1.getTime())));
 			LOG.info(String.format("------------------------------------------------------------------------------------------------------------ \n"));
-			long sleepTime = time2.getTime() - time1.getTime();
-			if (sleepTime < 0) {sleepTime = 0;};
-			LOG.info(String.format("sleepTime is " + sleepTime + "\n"));
-            Thread.sleep(1000-sleepTime);           
+			long writeTime = time2.getTime() - time1.getTime();
+			if (writeTime < 0) {writeTime = 0;};
+			LOG.info(String.format("writeTime is " + writeTime + "\n"));
+            		Thread.sleep(1000-writeTime);           
         }
     }
 
