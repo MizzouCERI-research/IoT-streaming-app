@@ -1,0 +1,60 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Launch MeasurementProcessor",
+            "request": "launch",
+            "mainClass": "org.example.basicApp.client.MeasurementProcessor",
+            "projectName": "testKinesisApp"
+        },
+        {
+            "type": "java",
+            "name": "Launch DynamoDBWriter",
+            "request": "launch",
+            "mainClass": "org.example.basicApp.ddb.DynamoDBWriter",
+            "projectName": "testKinesisApp"
+        },
+        {
+            "type": "java",
+            "name": "Launch MuseOscServer",
+            "request": "launch",
+            "mainClass": "org.example.basicApp.muse.MuseOscServer",
+            "projectName": "testKinesisApp"
+        },
+        {
+            "type": "java",
+            "name": "Launch DeleteSampleResources",
+            "request": "launch",
+            "mainClass": "org.example.basicApp.utils.DeleteSampleResources",
+            "projectName": "testKinesisApp"
+        },
+        {
+            "type": "java",
+            "name": "Launch WebServer",
+            "request": "launch",
+            "mainClass": "org.example.basicApp.webserver.WebServer",
+            "projectName": "testKinesisApp"
+        },
+        {
+            "type": "java",
+            "name": "Launch MeasurementWriter",
+            "request": "launch",
+            "mainClass": "org.example.basicApp.writer.MeasurementWriter",
+            "projectName": "testKinesisApp",
+            "args": [
+                "my_stream",
+                "us-east-1"
+              ]
+        }
+    ]
+}
