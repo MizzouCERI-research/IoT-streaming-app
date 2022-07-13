@@ -9,30 +9,32 @@ The IoT application can be run in three different architecture: Cloud-only, Edge
 ![Architecture](https://user-images.githubusercontent.com/10638886/178800334-dd2c2d19-3ea2-4aa0-8352-96fe876b2eab.png)
 
 ### Cloud-only architecture
-- Raw data
+- Raw data are collected from IoT sensors and sent to Kinesis stream
 - Kinesis stream/Shards
-- EC2 instance processor
-- DynamoDB + S3
+- EC2 instance as RAW data processor, 
+- Processor processes data, and send the processed data to DynamoDB
+- RAW data can be stored on S3 
+- Processed data are visualized via http servlet pulling data from DynamoDB
 
 ### Edge-cloud architecture
-- Processed data
-- DynamoDB + S3
+- Edge computer collect data from IoT sensors, and processes RAW data
+- Processed data are sent to and stored in DynamoDB
+- No data processor needed in the cloud
+- Processed data can be stored on S3 
+- Processed data are visualized via http servlet pulling data from DynamoDB
 
 ### Edge-only architecture
-- Processed data
-- DynamoDB-local
+- Edge computer collect and process RAW data
+- Processed data are sent to and stored in DynamoDB-local
+- No Kinesis streams needed
+- Processed data are visualized via http servlet pulling data from DynamoDB-local
+ 
 
+## Running the app in Cloud-Only architecture:
 
-
-
-
-
-## If running the app on AWS cloud, setup environment to run the visualApp application on an EC2 instance:
-
-1. Create an AWS EC2 instance and attach an IAM role that has Kinesis/DynamoDB full access.
-2. SSH into the EC2 instance
-3. Clone this repo onto the instance 
-4. Run the following commands: 
+1. Use local computer or create an AWS EC2 instance and attach an IAM role that has Kinesis/DynamoDB full access.
+2. Clone this repo to local computer or the EC2 instance 
+3. Setup the following: 
 
 	a. Install JAVA SDK: look up how to on internet
 	
@@ -40,11 +42,47 @@ The IoT application can be run in three different architecture: Cloud-only, Edge
 	
 	c. Add both maven compiler and JAVA SDK to your environment path variable (if they are not in there already)
 	
-	d. Change into the repo root directory
+	d. Configure AWS credentials (accessKey and secretKey) if using local computer
 
-## If running the app from local, To run the application on edge-cloud architecture: 
+4. From inside the repo root directory, run the following commands (replace ??? with your AWS account accessKeyId and secretKey, or create an environment variable as below), each in a separate terminal:
+		
+	```bash
+	$ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -Pstream-writer exec:java
+	$ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -PclientApp exec:java
+	$ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -Pwebserver exec:java
+	```
+	Open web browser: type http://localhost:8080 (if not working, use http://EC2_IP:8080/overview.html) to visualize sensor data
 
-1. type the following (replace ??? with your AWS account accessKeyId and secretKey, or create an environment variable as below), each in a separate terminal:
+	or
+
+	```bash
+	$ export MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???"
+	$ mvn compile -Pstream-writer exec:java
+	$ mvn compile -PclientApp exec:java
+	$ mvn compile -Pwebserver exec:java
+	``` 
+	Open from web browser: http://localhost:8080 (if not working, use http://EC2_IP:8080/overview.html) to visualize sensor data
+
+5. To change data rate:
+
+   a. Open /src/main/java/org/example/basicApp/writer/MeasurementWriter.java, 
+   b. Find and change the value of the variable "DELAY_BETWEEN_RECORDS_IN_MILLIS" from 1000 to 5000 (5 sec) or 10000 (10 sec).
+   c. Open visualApp/src/main/static-content/wwwroot/overview.js, 
+   d. Find and change the variable "data_interval" from 1000 to 5000 (5 sec) or 10000 (10 sec) similar to step 2.a.
+
+6. To change name of DynamoDB: Edit visualApp/pom.xml (rename: sample-application.name, sample-application.stream, and sample-application.measurement-table, to whatever you like)
+
+7. To change number of users: Open visualApp/src/main/java/org/example/basicApp/ writer/MeasurementPutter.java
+
+   Find and change the variable "numUsers" from 1 to 5, 10, etc. 	
+	
+	
+	
+## Running the application in Edge-Cloud architecture: 
+
+1. 2. 3. All follow the Cloud-Only architecture steps, except only local computer is used 
+
+4. From the repo root directory, type the following (replace ??? with your AWS account accessKeyId and secretKey, or create an environment variable as below), each in a separate terminal:
 		
 	```bash
 	$ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -PdbWriter exec:java
@@ -61,52 +99,19 @@ The IoT application can be run in three different architecture: Cloud-only, Edge
 	```
 
 	Open from web browser: http://localhost:8080 (if not working, use http://localhost:8080/overview.html)
+	
+5. To change data rate:
 
-2. To change data rate:
-   a. Open visualApp/src/main/java/org/example/basicApp/ddb/DynamoDBWriter.java, 
-   b. Go to Line 116 and change the value from sleep(1000) to sleep(5000) for 5 sec and sleep(10000) for 10 sec.
+   a. Open /src/main/java/org/example/basicApp/writer/MeasurementWriter.java, 
+   b. Find and change the value of the variable "DELAY_BETWEEN_RECORDS_IN_MILLIS" from 1000 to 5000 (5 sec) or 10000 (10 sec).
    c. Open visualApp/src/main/static-content/wwwroot/overview.js, 
-   d. go to line 269 and change the 1000 to 5000 or 10000 based on step 2.b.
+   d. Find and change the variable "data_interval" from 1000 to 5000 (5 sec) or 10000 (10 sec) similar to step 2.a.
 
-3. To change name of DynamoDB:
-   a. Edit visualApp/pom.xml (rename the DB table to whatever you want to)
+6. To change name of DynamoDB: Edit visualApp/pom.xml (rename: sample-application.name, sample-application.stream, and sample-application.measurement-table, to whatever you like)
 
-4. To change number of users:
-   a. Open visualApp/src/main/java/org/example/basicApp/ddb/DynamoDBWriter.java
-   b. Go to Line 62 and change numUsers=1 to 5, 10, etc.
+7. To change number of users: Open visualApp/src/main/java/org/example/basicApp/ writer/MeasurementPutter.java
 
-### To run the application on cloud only architecture: 
+   Find and change the variable "numUsers" from 1 to 5, 10, etc. 	
+	
 
-1. type the following (replace ??? with your AWS account accessKeyId and secretKey, or create an environment variable as below), each in a separate terminal:
-		
-	```bash
-	$ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -Pstream-writer exec:java
-	$ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -PclientApp exec:java
-	$ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -Pwebserver exec:java
-	```
-
-	Open web browser: type http://localhost:8080 (if not working, use http://localhost:8080/overview.html)
-
-	or
-
-	```bash
-	$ export MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???"
-	$ mvn compile -PdbWriter exec:java
-	$ mvn compile -Pwebserver exec:java
-	``` 
-
-	Open from web browser: http://localhost:8080 (if not working, use http://localhost:8080/overview.html)
-
-2. To change data rate:
-
-   a. Open visualApp /src/main/java/org/example/basicApp/writer/MeasurementWriter.java, 
-   b. Go to Line 29 and change the value from 1000 to 5000 for 5 sec and 10000 for 10 sec.
-   c. Open visualApp/src/main/static-content/wwwroot/overview.js, 
-   d. Go to line 269 and change the 1000 to 5000 or 10000 based on step 2.a.
-
-3. To change name of DynamoDB: Edit visualApp/pom.xml (rename: sample-application.name, sample-application.stream, and sample-application.measurement-table, to whatever you like)
-
-4. To change number of users: Open visualApp/src/main/java/org/example/basicApp/ writer/MeasurementPutter.java
-
-   Go to Line 23 and change numUsers=1 to 5, 10, etc.
 
