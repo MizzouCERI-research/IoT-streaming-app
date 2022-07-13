@@ -3,12 +3,10 @@
 This repo is an application that collects sensor data from EEG IoT devices, and send them to AWS Kinesis streams for storage in DynamoDB, and visualize on http servlet. 
 
 The IoT application can be run in three different architecture: Cloud-only, Edge-cloud, and Edge-only.
-
+<!-- 
 [Architecture] (https://github.com/MizzouCERI-research/IoT-streaming-app/blob/master/img/architecture.png)
-
-
-
-![image](https://user-images.githubusercontent.com/10638886/178799429-c01bf642-6380-43e1-9889-fa235bfc65e8.png)
+ -->
+![Architecture](https://user-images.githubusercontent.com/10638886/178799429-c01bf642-6380-43e1-9889-fa235bfc65e8.png)
 
 
 
