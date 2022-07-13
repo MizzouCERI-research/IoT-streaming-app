@@ -6,7 +6,7 @@ The IoT application can be run in three different architecture: Cloud-only, Edge
 <!-- 
 [Architecture] (https://github.com/MizzouCERI-research/IoT-streaming-app/blob/master/img/architecture.png)
  -->
-![Architecture](https://user-images.githubusercontent.com/10638886/178799429-c01bf642-6380-43e1-9889-fa235bfc65e8.png)
+![Architecture](https://user-images.githubusercontent.com/10638886/178800226-7785a4de-e6fb-42f2-9d4c-9979c0f38a76.png)
 
 ### Cloud-only architecture
 - Raw data
