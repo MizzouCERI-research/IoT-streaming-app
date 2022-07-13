@@ -119,3 +119,14 @@ The IoT application can be run in three different architecture: Cloud-only, Edge
 1. Check DynamoDB-local manual: [DynamoDB-local](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html)
 
 2. Everything else is similar to Edge-Cloud architecture
+
+
+## Visualization examples:
+
+### To view the current EEG sensor data for selected users: 
+![image](https://user-images.githubusercontent.com/10638886/178807441-026fae98-d847-41e4-a360-ed63f037d7f9.png)
+
+### To view the historical EEG sensor data for a specific user: 
+<img width="1049" alt="image" src="https://user-images.githubusercontent.com/10638886/178807545-6a4b5f33-bb83-4000-a40b-551442a0b499.png">
+
+
