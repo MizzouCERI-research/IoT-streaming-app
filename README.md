@@ -9,9 +9,13 @@ This repo is an application that collects sensor data from EEG IoT devices, and 
 2. SCP Upload the visualAPP.tar application onto EC2 using AWS credentials and EC2 IP address
 3. SSH into the EC2 instance
 4. Run the following commands on EC2 instance: 
+
 	a. Unzip application: tar xzvf visualAPP.tar
+
 	b. Install JAVA SDK: look up how to on internet
+	
 	c. Install apache maven compiler on Amazon Linux: look up how to on internet
+	
 	d. Add both maven compiler and JAVA SDK to your environment path variable (if they are not in there already)
 
 ## To run the application on edge-cloud architecture: 
