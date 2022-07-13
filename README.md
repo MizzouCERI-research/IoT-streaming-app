@@ -4,6 +4,8 @@ This repo is an application that collects sensor data from EEG IoT devices, and 
 
 The IoT application can be run in three different architecture: Cloud-only, Edge-cloud, and Edge-only.
 
+[Architecture] (https://github.com/MizzouCERI-research/IoT-streaming-app/blob/master/img/architecture.png)
+
 
 
 
