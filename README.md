@@ -1,4 +1,4 @@
-Setup environment to run the visualApp application on AWS EC2:
+## Setup environment to run the visualApp application on AWS EC2:
 
 1.	Create an AWS EC2 instance and add the IAM role that has administrative privileges.
 2.	SCP Upload the visualAPP.tar application onto EC2 using AWS credentials and EC2 IP address
@@ -9,9 +9,9 @@ Setup environment to run the visualApp application on AWS EC2:
 	c. Install apache maven compiler on Amazon Linux: look up how to on internet
 	d. Add both maven compiler and JAVA SDK to your environment path variable (if they are not in there already)
 
-To run the application on edge-cloud architecture: 
+## To run the application on edge-cloud architecture: 
 
-	1.	type the following (replace ??? with your AWS account accessKeyId and secretKey, or create an environment variable as below),
+1.	type the following (replace ??? with your AWS account accessKeyId and secretKey, or create an environment variable as below),
                 each in a separate terminal:
 		
 		```bash
@@ -32,22 +32,22 @@ To run the application on edge-cloud architecture:
 		Open from web browser: http://localhost:8080 (if not working, use http://localhost:8080/overview.html)
 
 
-	2.	To change data rate:
+2.	To change data rate:
 		a. Open visualApp/src/main/java/org/example/basicApp/ddb/DynamoDBWriter.java, 
 		b. Go to Line 116 and change the value from sleep(1000) to sleep(5000) for 5 sec and sleep(10000) for 10 sec.
 		c. Open visualApp/src/main/static-content/wwwroot/overview.js, 
 		d. go to line 269 and change the 1000 to 5000 or 10000 based on step 2.b.
 
-	3.	To change name of DynamoDB:
+3.	To change name of DynamoDB:
 		a. Edit visualApp/pom.xml (rename the DB table to whatever you want to)
 
-	4.	To change number of users:
+4.	To change number of users:
 		a. Open visualApp/src/main/java/org/example/basicApp/ddb/DynamoDBWriter.java
 		b. Go to Line 62 and change numUsers=1 to 5, 10, etc.
 
-To run the application on cloud only architecture: 
+### To run the application on cloud only architecture: 
 
-	1. 	type the following (replace ??? with your AWS account accessKeyId and secretKey, or create an environment variable as below),
+1. 	type the following (replace ??? with your AWS account accessKeyId and secretKey, or create an environment variable as below),
                 each in a separate terminal:
 		
 		```bash
@@ -68,16 +68,16 @@ To run the application on cloud only architecture:
 
                 Open from web browser: http://localhost:8080 (if not working, use http://localhost:8080/overview.html)
 
-	2.	To change data rate:
+2.	To change data rate:
 
 		a. Open visualApp /src/main/java/org/example/basicApp/writer/MeasurementWriter.java, 
 		b. Go to Line 29 and change the value from 1000 to 5000 for 5 sec and 10000 for 10 sec.
 		c. Open visualApp/src/main/static-content/wwwroot/overview.js, 
 		d. Go to line 269 and change the 1000 to 5000 or 10000 based on step 2.a.
 
-	3.	To change name of DynamoDB: Edit visualApp/pom.xml (rename: sample-application.name, sample-application.stream, and sample-application.measurement-table, to whatever you like)
+3.	To change name of DynamoDB: Edit visualApp/pom.xml (rename: sample-application.name, sample-application.stream, and sample-application.measurement-table, to whatever you like)
 
-	4.	To change number of users: Open visualApp/src/main/java/org/example/basicApp/ writer/MeasurementPutter.java
+4.	To change number of users: Open visualApp/src/main/java/org/example/basicApp/ writer/MeasurementPutter.java
 
-b.	Go to Line 23 and change numUsers=1 to 5, 10, etc.
+	Go to Line 23 and change numUsers=1 to 5, 10, etc.
 
