@@ -121,7 +121,7 @@ The IoT application can be run in three different architecture: Cloud-only, Edge
 2. Everything else is similar to Edge-Cloud architecture
 
 
-## Visualization examples:
+## Visualization screenshots:
 
 ### To view the current EEG sensor data for selected users: 
 <img width="800" alt="image" src="https://user-images.githubusercontent.com/10638886/178807441-026fae98-d847-41e4-a360-ed63f037d7f9.png">
