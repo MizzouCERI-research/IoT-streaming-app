@@ -127,6 +127,6 @@ The IoT application can be run in three different architecture: Cloud-only, Edge
 ![image](https://user-images.githubusercontent.com/10638886/178807441-026fae98-d847-41e4-a360-ed63f037d7f9.png)
 
 ### To view the historical EEG sensor data for a specific user: 
-<img width="1049" alt="image" src="https://user-images.githubusercontent.com/10638886/178807545-6a4b5f33-bb83-4000-a40b-551442a0b499.png">
+<img width="800" alt="image" src="https://user-images.githubusercontent.com/10638886/178807667-ff265a83-4b05-445b-94cd-30cd544601ed.png">
 
 
