@@ -22,9 +22,6 @@ The IoT application can be run in three different architecture: Cloud-only, Edge
 - Processed data
 - DynamoDB-local
 
-![image](https://user-images.githubusercontent.com/10638886/178799594-7fc1b67b-ed58-41d3-987a-07b179015077.png)
-
-
 
 
 
