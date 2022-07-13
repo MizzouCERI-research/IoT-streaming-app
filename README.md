@@ -44,12 +44,12 @@ The IoT application can be run in three different architecture: **Cloud-Only**, 
 	
 	d. Configure AWS credentials (accessKey and secretKey) if using local computer
 
-4. From inside the repo root directory, run the following commands (replace ??? with your AWS account accessKeyId and secretKey, or create an environment variable as below), each in a separate terminal:
+4. From inside the repo root directory, run the following commands (replace ??? with your AWS account accessKeyId and secretKey, or create an environment variable as below), each in a separate terminal (Mame sure you provide the required parameters!) :
 		
 	```bash
-	$ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -Pstream-writer exec:java
-	$ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -PclientApp exec:java
-	$ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -Pwebserver exec:java
+	$ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -Pstream-writer exec:java $stream_name $aws_region
+	$ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -PclientApp exec:java $application_name $stream_name $DynamoDB_table_name $aws_region
+	$ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -Pwebserver exec:java $port_number $directory_for_static_content  $DynamoDB_tablename $aws_region
 	```
 	Open web browser: type http://localhost:8080 (if not working, use http://EC2_IP:8080/overview.html) to visualize sensor data
 
@@ -57,9 +57,9 @@ The IoT application can be run in three different architecture: **Cloud-Only**, 
 
 	```bash
 	$ export MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???"
-	$ mvn compile -Pstream-writer exec:java
-	$ mvn compile -PclientApp exec:java
-	$ mvn compile -Pwebserver exec:java
+	$ mvn compile -Pstream-writer exec:java $aws_region
+	$ mvn compile -PclientApp exec:java $application_name $stream_name $DynamoDB_table_name $aws_region
+	$ mvn compile -Pwebserver exec:java $port_number $directory_for_static_content  $DynamoDB_tablename $aws_region
 	``` 
 	Open from web browser: http://localhost:8080 (if not working, use http://EC2_IP:8080/overview.html) to visualize sensor data
 
@@ -85,8 +85,8 @@ The IoT application can be run in three different architecture: **Cloud-Only**, 
 4. From the repo root directory, type the following (replace ??? with your AWS account accessKeyId and secretKey, or create an environment variable as below), each in a separate terminal:
 		
 	```bash
-	$ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -PdbWriter exec:java
-	$ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -Pwebserver exec:java
+	$ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -PdbWriter exec:java $DynamoDB_tablename $aws_region
+	$ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -Pwebserver exec:java $port_number $directory_for_static_content  $DynamoDB_tablename $aws_region
 	```
 	Open from web browser: http://localhost:8080 (if not working, use http://localhost:8080/overview.html)
 
@@ -94,8 +94,8 @@ The IoT application can be run in three different architecture: **Cloud-Only**, 
 
 	```bash
 	$ export MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???"
-	$ mvn compile -PdbWriter exec:java
-	$ mvn compile -Pwebserver exec:java
+	$ mvn compile -PdbWriter exec:java $DynamoDB_tablename $aws_region
+	$ mvn compile -Pwebserver exec:java $port_number $directory_for_static_content  $DynamoDB_tablename $aws_region
 	```
 
 	Open from web browser: http://localhost:8080 (if not working, use http://localhost:8080/overview.html)
