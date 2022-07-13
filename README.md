@@ -8,6 +8,7 @@ The IoT application can be run in three different architecture: Cloud-only, Edge
 
 
 
+![image](https://user-images.githubusercontent.com/10638886/178799429-c01bf642-6380-43e1-9889-fa235bfc65e8.png)
 
 
 
