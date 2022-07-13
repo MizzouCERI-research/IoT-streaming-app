@@ -8,7 +8,7 @@ The IoT application can be run in three different architecture: **Cloud-only**, 
  -->
 <img width="800" alt="image" src="https://user-images.githubusercontent.com/10638886/178800334-dd2c2d19-3ea2-4aa0-8352-96fe876b2eab.png">
 
-### Cloud-only architecture
+### Cloud-Only architecture
 - Raw data are collected from IoT sensors and sent to Kinesis stream
 - Kinesis stream/Shards
 - EC2 instance as RAW data processor, 
@@ -16,14 +16,14 @@ The IoT application can be run in three different architecture: **Cloud-only**, 
 - RAW data can be stored on S3 
 - Processed data are visualized via http servlet pulling data from DynamoDB
 
-### Edge-cloud architecture
+### Edge-Cloud architecture
 - Edge computer collect data from IoT sensors, and processes RAW data
 - Processed data are sent to and stored in DynamoDB
 - No data processor needed in the cloud
 - Processed data can be stored on S3 
 - Processed data are visualized via http servlet pulling data from DynamoDB
 
-### Edge-only architecture
+### Edge-Only architecture
 - Edge computer collect and process RAW data
 - Processed data are sent to and stored in DynamoDB-local
 - No Kinesis streams needed
@@ -116,7 +116,7 @@ The IoT application can be run in three different architecture: **Cloud-only**, 
 
 ## We herein are not providing instructions for Edge-Only architecture 
 
-1. Check DynamoDB-local manual: [DynamoDB-local](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html)
+1. Check DynamoDB-local manual to implement local database: [DynamoDB-local](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html)
 
 2. Everything else is similar to Edge-Cloud architecture
 
