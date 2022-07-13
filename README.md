@@ -1,3 +1,6 @@
+# This repo is an application that collects sensor data from EEG IoT devices, and send them to AWS Kinesis streams for storage in DynamoDB, and visualize on http servlet. 
+
+
 ## Setup environment to run the visualApp application on AWS EC2:
 
 1. Create an AWS EC2 instance and add the IAM role that has administrative privileges.
