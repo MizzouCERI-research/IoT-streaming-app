@@ -116,6 +116,6 @@ The IoT application can be run in three different architecture: Cloud-only, Edge
 
 ## We herein are not providing instructions for Edge-Only architecture 
 
-1. check DynamoDB-local implementation manual: [DynamoDB-local](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html)
+1. Check DynamoDB-local manual: [DynamoDB-local](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html)
 
 2. Everything else is similar to Edge-Cloud architecture
