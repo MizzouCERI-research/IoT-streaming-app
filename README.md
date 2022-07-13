@@ -13,21 +13,21 @@
 
 1. type the following (replace ??? with your AWS account accessKeyId and secretKey, or create an environment variable as below), each in a separate terminal:
 		
-  ```bash
-  $ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -PdbWriter exec:java
-  $ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -Pwebserver exec:java
-  ```
-  Open from web browser: http://localhost:8080 (if not working, use http://localhost:8080/overview.html)
+	  ```bash
+	  $ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -PdbWriter exec:java
+	  $ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -Pwebserver exec:java
+	  ```
+	  Open from web browser: http://localhost:8080 (if not working, use http://localhost:8080/overview.html)
 
-  or 
+	  or 
 
-  ```bash
-  $ export MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???"
-  $ mvn compile -PdbWriter exec:java
-  $ mvn compile -Pwebserver exec:java
-  ```
+	  ```bash
+	  $ export MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???"
+	  $ mvn compile -PdbWriter exec:java
+	  $ mvn compile -Pwebserver exec:java
+	  ```
 
-  Open from web browser: http://localhost:8080 (if not working, use http://localhost:8080/overview.html)
+	  Open from web browser: http://localhost:8080 (if not working, use http://localhost:8080/overview.html)
 
 2. To change data rate:
    a. Open visualApp/src/main/java/org/example/basicApp/ddb/DynamoDBWriter.java, 
@@ -46,23 +46,23 @@
 
 1. type the following (replace ??? with your AWS account accessKeyId and secretKey, or create an environment variable as below), each in a separate terminal:
 		
-  ```bash
-  $ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -Pstream-writer exec:java
-  $ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -PclientApp exec:java
-  $ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -Pwebserver exec:java
-  ```
+	  ```bash
+	  $ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -Pstream-writer exec:java
+	  $ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -PclientApp exec:java
+	  $ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -Pwebserver exec:java
+	  ```
 
-  Open web browser: type http://localhost:8080 (if not working, use http://localhost:8080/overview.html)
+	  Open web browser: type http://localhost:8080 (if not working, use http://localhost:8080/overview.html)
 
-  or
-		
-  ```bash
-  $ export MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???"
-  $ mvn compile -PdbWriter exec:java
-  $ mvn compile -Pwebserver exec:java
-  ``` 
+	  or
 
-  Open from web browser: http://localhost:8080 (if not working, use http://localhost:8080/overview.html)
+	  ```bash
+	  $ export MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???"
+	  $ mvn compile -PdbWriter exec:java
+	  $ mvn compile -Pwebserver exec:java
+	  ``` 
+
+	  Open from web browser: http://localhost:8080 (if not working, use http://localhost:8080/overview.html)
 
 2. To change data rate:
 
