@@ -1,4 +1,4 @@
-# IoT Streaming Application using AWS Kinesis/DynamoDB
+# IoT Streaming and Visualization Application using AWS Kinesis/DynamoDB
 
 This repo is an application that collects sensor data from EEG IoT devices, and send them to AWS Kinesis streams for storage in DynamoDB, and visualize on http servlet. 
 
