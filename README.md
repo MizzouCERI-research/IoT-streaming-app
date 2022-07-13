@@ -2,23 +2,35 @@
 
 This repo is an application that collects sensor data from EEG IoT devices, and send them to AWS Kinesis streams for storage in DynamoDB, and visualize on http servlet. 
 
+The IoT application can be run in three different architecture: Cloud-only, Edge-cloud, and Edge-only. 
 
-## Setup environment to run the visualApp application on AWS EC2:
 
-1. Create an AWS EC2 instance and add the IAM role that has administrative privileges.
-2. SCP Upload the visualAPP.tar application onto EC2 using AWS credentials and EC2 IP address
-3. SSH into the EC2 instance
-4. Run the following commands on EC2 instance: 
 
-	a. Unzip application: tar xzvf visualAPP.tar
 
-	b. Install JAVA SDK: look up how to on internet
+
+
+
+
+
+
+
+
+## If running the app on AWS cloud, setup environment to run the visualApp application on an EC2 instance:
+
+1. Create an AWS EC2 instance and attach an IAM role that has Kinesis/DynamoDB full access.
+2. SSH into the EC2 instance
+3. Clone this repo onto the instance 
+4. Run the following commands: 
+
+	a. Install JAVA SDK: look up how to on internet
 	
-	c. Install apache maven compiler on Amazon Linux: look up how to on internet
+	b. Install Apache Maven compiler: look up how to on internet
 	
-	d. Add both maven compiler and JAVA SDK to your environment path variable (if they are not in there already)
+	c. Add both maven compiler and JAVA SDK to your environment path variable (if they are not in there already)
+	
+	d. Change into the repo root directory
 
-## To run the application on edge-cloud architecture: 
+## If running the app from local, To run the application on edge-cloud architecture: 
 
 1. type the following (replace ??? with your AWS account accessKeyId and secretKey, or create an environment variable as below), each in a separate terminal:
 		
