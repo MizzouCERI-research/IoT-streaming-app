@@ -12,6 +12,7 @@ window.onload= function(){
 	var numUsers;
 	var resource = "Muse Sensor";
 	var secondsAgo = 5;
+	var data_interval = 1000
 	var data=[];
 	var chart = new CanvasJS.Chart("chartContainer", {
 			title: {
@@ -275,6 +276,6 @@ window.onload= function(){
 		updateData(resource, secondsAgo, function(){
 			updateChart(chart, data);
 	    });
-	}, 1000);
+	}, data_interval);
 
 }
