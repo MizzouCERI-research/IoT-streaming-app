@@ -24,11 +24,11 @@
             <version>${amazon-kinesis-client.version}</version>
         </dependency>
 
-         <dependency>
+         <!-- <dependency>
             <groupId>org.example.basicApp.muse</groupId>
             <artifactId>oscP5</artifactId>
             <version>1.0</version>
-        </dependency>
+        </dependency> -->
 
         <dependency>
             <groupId>org.eclipse.jetty</groupId>

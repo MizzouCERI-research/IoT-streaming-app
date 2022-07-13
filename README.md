@@ -11,13 +11,26 @@ Setup environment to run the visualApp application on AWS EC2:
 
 To run the application on edge-cloud architecture: 
 
-	1.	type the following (replace ??? with your AWS account accessKeyId and secretKey) each in a separate terminal:
+	1.	type the following (replace ??? with your AWS account accessKeyId and secretKey, or create an environment variable as below),
+                each in a separate terminal:
+		
+		```bash
+		$ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -PdbWriter exec:java
+		$ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -Pwebserver exec:java
+		```
 
-		MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -PdbWriter exec:java
+		Open from web browser: http://localhost:8080 (if not working, use http://localhost:8080/overview.html)
 
-		MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -Pwebserver exec:java
+		or 
+		
+		```bash
+		$ export MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???"
+		$ mvn compile -PdbWriter exec:java
+		$ mvn compile -Pwebserver exec:java
+		```
 
-		Open web browser: type http://localhost:8080 (if not working, use http://localhost:8080/overview.html)
+		Open from web browser: http://localhost:8080 (if not working, use http://localhost:8080/overview.html)
+
 
 	2.	To change data rate:
 		a. Open visualApp/src/main/java/org/example/basicApp/ddb/DynamoDBWriter.java, 
@@ -34,15 +47,26 @@ To run the application on edge-cloud architecture:
 
 To run the application on cloud only architecture: 
 
-	1.	type the following (replace ??? with your AWS account accessKeyId and secretKey) each in a separate terminal:
-
-		MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -Pstream-writer exec:java
-
-		MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -PclientApp exec:java
-
-		MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -Pwebserver exec:java
+	1. 	type the following (replace ??? with your AWS account accessKeyId and secretKey, or create an environment variable as below),
+                each in a separate terminal:
+		
+		```bash
+		$ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -Pstream-writer exec:java
+		$ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -PclientApp exec:java
+		$ MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???" mvn compile -Pwebserver exec:java
+		```
 
 		Open web browser: type http://localhost:8080 (if not working, use http://localhost:8080/overview.html)
+
+                or
+		
+		```bash
+                $ export MAVEN_OPTS="-Daws.accessKeyId=??? -Daws.secretKey=???"
+                $ mvn compile -PdbWriter exec:java
+                $ mvn compile -Pwebserver exec:java
+		``` 
+
+                Open from web browser: http://localhost:8080 (if not working, use http://localhost:8080/overview.html)
 
 	2.	To change data rate:
 
